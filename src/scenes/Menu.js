@@ -11,6 +11,7 @@ class Menu extends Phaser.Scene {
             frameWidth: 48,
         });
         this.load.image("rock", "./assets/rrrock.png");
+        this.load.image("arrow", "./assets/arrow.png");
     }
 
     create () {
@@ -28,12 +29,12 @@ class Menu extends Phaser.Scene {
             },
         };
 
-        this.crumbButton = this.add.text(game.config.width / 5, game.config.height + 100, "crumb", buttonConfig);
+        this.crumbButton = this.add.text(width / 5, height + 100, "crumb", buttonConfig);
         this.crumbIn = this.tweens.add({
             targets: this.crumbButton,
             y: {
-                from: game.config.height + 100,
-                to: game.config.height - (game.config.height / 4),
+                from: height + 100,
+                to: height - (height / 4),
             },
             ease: "Cubic",
             duration: 1000,
@@ -54,12 +55,12 @@ class Menu extends Phaser.Scene {
         });
 
 
-        this.tailButton = this.add.text(game.config.width - (game.config.width / 2) + 40, game.config.height + 100, "tail", buttonConfig);
+        this.tailButton = this.add.text(width - (width / 2) + 40, height + 100, "tail", buttonConfig);
         this.tailIn = this.tweens.add({
             targets: this.tailButton,
             y: {
-                from: game.config.height + 100,
-                to: game.config.height - (game.config.height / 4),
+                from: height + 100,
+                to: height - (height / 4),
             },
             ease: "Cubic",
             duration: 1000,
@@ -77,6 +78,31 @@ class Menu extends Phaser.Scene {
         });
         this.tailButton.on("pointerdown", () => {
             this.timer = this.time.delayedCall(1000, () => {this.scene.start("tailScene")});
+        });
+
+        this.boneButton = this.add.text(width + 100, height / 2 + 100, "bone", buttonConfig);
+        this.boneIn = this.tweens.add({
+            targets: this.boneButton,
+            x: {
+                from: this.boneButton.x,
+                to: width - (width / 2) + 40,
+            },
+            ease: "Cubic",
+            duration: 1000,
+            repeat: 0,
+            yoyo: false,
+        });
+        this.boneButton.setInteractive();
+        this.boneButton.on("pointerover", () => {
+            this.boneButton.setBackgroundColor("#da5125");
+            this.boneButton.setColor("#ffff8e");
+        });
+        this.boneButton.on("pointerout", () => {
+            this.boneButton.setBackgroundColor("#0398FC");
+            this.boneButton.setColor("#843605");
+        });
+        this.boneButton.on("pointerdown", () => {
+            this.timer = this.time.delayedCall(1000, () => {this.scene.start("boneScene")});
         });
     }
 

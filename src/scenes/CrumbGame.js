@@ -1,6 +1,6 @@
 class CrumbGame extends Phaser.Scene {
     constructor() {
-        super('crumbScene')
+        super('crumbScene');
     }
 
     init() {
