@@ -15,7 +15,7 @@ class Menu extends Phaser.Scene {
     }
 
     create () {
-        this.cameras.main.setBackgroundColor(0xDDDDDD);
+        this.cameras.main.setBackgroundColor(0xBEEEED);
 
         let buttonConfig = {
             fontFamily: "Courier",
@@ -104,6 +104,33 @@ class Menu extends Phaser.Scene {
         this.boneButton.on("pointerdown", () => {
             this.timer = this.time.delayedCall(1000, () => {this.scene.start("boneScene")});
         });
+
+        if (this.textures.exists("gamesnapshot")) {
+            let screenshot = this.add.image(width / 2, height / 2, "gamesnapshot");
+            let iris = this.add.graphics()
+            iris.fillRect(0, 0, width, height).fillStyle(0x000000).lineStyle(4, 0xfacade);
+
+            const mask = iris.createGeometryMask();
+            screenshot.setMask(mask);
+            this.irisout = this.tweens.add({
+                targets: iris,
+                x: width / 2,
+                y: height / 2,
+                scale: 0,
+                ease: "linear",
+                duration: 300,
+                repeat: 0,
+                yoyo: false,
+                paused: false,
+                onComplete: () => {
+                    screenshot.destroy();
+                    iris.destroy();
+                    mask.destroy();
+                }
+            });
+        } else {
+            console.log('texture error');
+        }
     }
 
     update() {

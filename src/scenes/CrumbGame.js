@@ -12,7 +12,7 @@ class CrumbGame extends Phaser.Scene {
 
     create() {
         this.cameras.main.postFX.addPixelate(0.4);
-        this.cameras.main.setBackgroundColor(0xDDDDDD);
+        this.cameras.main.setBackgroundColor(0xFACADE);
         this.player = this.physics.add.sprite(width / 2, height / 2, "character", 1).setScale(2);
         this.player.body.setCollideWorldBounds(true);
         this.player.body.setCircle(this.player.body.width / 3, this.player.body.width / 2 - this.player.body.width / 3, this.player.body.height / 4);
@@ -26,6 +26,8 @@ class CrumbGame extends Phaser.Scene {
         this.physics.add.collider(this.player, this.crumbGroup, () => {
             console.log(" HII !!!");
         });
+        this.gameOver = false;
+        
     }
 
     update() {
@@ -44,8 +46,18 @@ class CrumbGame extends Phaser.Scene {
             }
             playerVector.normalize();
             this.player.setVelocity(this.PLAYER_VELOCITY * playerVector.x, this.PLAYER_VELOCITY * playerVector.y);
-        } else {
-            
+        } else if (!this.gameOver) {
+            // Change the background to show the fat bird smiling instead!
+            // Maybe spawn some rotating sparkles or smth when you complete the sidequest
+            this.gameOver = true;
+            let textureManager = this.textures;
+            this.game.renderer.snapshot((snapshotImage) => {
+                if(textureManager.exists('gamesnapshot')) {
+                    textureManager.remove('gamesnapshot');
+                }
+                textureManager.addImage('gamesnapshot', snapshotImage);
+            });
+            this.scene.start("menuScene");
         }
         
     }
@@ -65,4 +77,5 @@ class CrumbGame extends Phaser.Scene {
         }
         return clear;
     }
+
 }
