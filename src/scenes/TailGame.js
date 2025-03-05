@@ -3,7 +3,9 @@ class TailGame extends Phaser.Scene {
         super('tailScene');
     }
     init() {
-        this.DIFFICULTY = 1;
+        this.DIFFICULTY = this.registry.get("DIFFICULTY");
+        this.LIVES = this.registry.get("LIVES");
+        this.NUM_PLAYED = this.registry.get("NUM_PLAYED") + 1;
         this.HAND_SPEED = (20 + this.DIFFICULTY) * (20 + this.DIFFICULTY);
         this.TAIL_SPEED = (20 + this.DIFFICULTY + 1) * (20 + this.DIFFICULTY + 1);
     }
@@ -13,13 +15,18 @@ class TailGame extends Phaser.Scene {
 
         this.physics.world.setBounds(0, 0, width, height);
 
+        this.gameOver = false;
+
         this.hand = this.physics.add.sprite(width - this.textures.get("rock").getSourceImage().width, height / 2, "rock").setCollideWorldBounds(true).setScale(1.5);
         this.tail = this.physics.add.sprite(this.textures.get("rock").getSourceImage().width, height / 2, "rock").setImmovable(true).setCollideWorldBounds(true).setBounce(1).setScale(1.5);
         this.tail.body.onWorldBounds = true;
 
         cursors = this.input.keyboard.createCursorKeys();
         this.physics.add.collider(this.hand, this.tail, () => {
-            console.log(" HII !!!");
+            console.log("GRABBED!!!");
+            this.gameOver = true;
+            this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
+            this.transitionOut();
         });
 
         this.grabbing = false;
@@ -41,25 +48,38 @@ class TailGame extends Phaser.Scene {
                 });
             }
         });
+        
+        this.tailDirection = -1;
+        function moveTail() {
+            this.tailMoveTo = this.tailDirection < 0 ? Phaser.Math.Between(this.tail.height, this.tail.body.y) : Phaser.Math.Between(this.tail.body.y, game.config.height - this.tail.height);
+            this.tweens.add({
+                targets: this.tail,
+                y: this.tailMoveTo,
+                ease: "Back.easeOut",
+                duration: 800000 / this.TAIL_SPEED,
+                onComplete: () => {
+                    this.tailDirection *= -1;
+                    this.time.delayedCall(500, moveTail, [], this);
+                },
+            });
+        }
+        
+        moveTail.call(this);
 
-        this.tail.setVelocityY(Phaser.Math.Between(1, 2) < 2 ? -this.TAIL_SPEED : this.TAIL_SPEED);
-
-        this.turnTimerConfig = {
-            args: null,
-            callback: () => {
-                this.tail.body.velocity.y *= -1;
+        this.progressBar = this.add.rectangle(0, height - 30, width, 60, 0xFFF000, 1).setOrigin(0, 0.5);
+        this.progess = this.add.tween({
+            targets: this.progressBar,
+            width: 0,
+            duration: 7000 - ((this.DIFFICULTY / 2) * 1000),
+            onComplete: () => {
+                this.timeUp = true;
+                this.LIVES -= 1;
+                console.log("Lives: " + this.LIVES);
+                this.registry.set("LIVES", this.LIVES);
+                this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
+                this.transitionOut();
             },
-            callbackScope: this,
-            delay: Phaser.Math.Between(700, 1400),
-            loop: true,
-        };
-
-        this.turnTimer = this.time.addEvent(this.turnTimerConfig);
-
-        this.physics.world.on('worldbounds', () => {
-            console.log("HIIIIII!!!!!!");
-            this.turnTimerConfig.delay = Phaser.Math.Between(700, 1400);
-            this.turnTimer.reset(this.turnTimerConfig);
+            onCompleteScope: this,
         });
 
         // this.tailTween = this.tweens.add({
@@ -79,7 +99,8 @@ class TailGame extends Phaser.Scene {
     }
 
     update() {
-        if (!this.grabbing){
+        if (!this.timeUp) {
+            if (!this.grabbing) {
             let handVector = new Phaser.Math.Vector2(0, 0);
             if (cursors.up.isDown){
                 handVector.y = -1;
@@ -88,7 +109,23 @@ class TailGame extends Phaser.Scene {
             }
             handVector.normalize();
             this.hand.setVelocity(0, this.HAND_SPEED * handVector.y);
+            }
         }
     }
 
+    transitionOut() {
+        let textureManager = this.textures;
+        this.game.renderer.snapshot((snapshotImage) => {
+            if(textureManager.exists('gamesnapshot')) {
+                textureManager.remove('gamesnapshot');
+            }
+            textureManager.addImage('gamesnapshot', snapshotImage);
+        });
+        if (this.LIVES > 0) {
+            console.log("going to transition to the transition scene!");
+            this.scene.start("transitionScene");
+        } else {
+            this.scene.start("menuScene");
+        }   
+    }
 }

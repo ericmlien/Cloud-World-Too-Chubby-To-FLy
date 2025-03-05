@@ -3,7 +3,7 @@ class BoneGame extends Phaser.Scene {
         super('boneScene');
     }
     init (){
-        this.DIFFICULTY = 1;
+        this.DIFFICULTY = this.registry.get("DIFFICULTY");
         this.GRAVITY = 400;
         this.BONE_SPEED =  400;
         this.ARROW_SPEED = 0.6;

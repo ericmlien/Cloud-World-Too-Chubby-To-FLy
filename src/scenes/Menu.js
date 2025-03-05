@@ -16,7 +16,16 @@ class Menu extends Phaser.Scene {
 
     create () {
         this.cameras.main.setBackgroundColor(0xBEEEED);
-
+        this.registry.set("GAMES", [
+            ["crumbScene", 0],
+            ["boneScene", 0],
+            ["tailScene", 0],
+        ]);
+        
+        this.registry.set("DIFFICULTY", 1);
+        this.registry.set("LIVES", 3);
+        this.registry.set("NUM_PLAYED", 1);
+        
         let buttonConfig = {
             fontFamily: "Courier",
             fontSize: 80,
@@ -104,7 +113,14 @@ class Menu extends Phaser.Scene {
         this.boneButton.on("pointerdown", () => {
             this.timer = this.time.delayedCall(1000, () => {this.scene.start("boneScene")});
         });
+        this.transitionIn();
+    }
 
+    update() {
+
+    }
+
+    transitionIn() {
         if (this.textures.exists("gamesnapshot")) {
             let screenshot = this.add.image(width / 2, height / 2, "gamesnapshot");
             let iris = this.add.graphics()
@@ -128,12 +144,29 @@ class Menu extends Phaser.Scene {
                     mask.destroy();
                 }
             });
+
+            this.popup = this.add.image(width / 2, height / 2, "rock").setOrigin(0.5, 0.5).setScale(0);
+            this.popupout = this.tweens.chain({
+                targets: this.popup,
+                loop: 0,
+                tweens: [
+                    {
+                        scale: 2,
+                        ease: "Expo.easeOut",
+                        duration: 200,
+                        repeat: 0,
+                    },
+                    {
+                        y: -this.popup.height,
+                        ease: "Back.easeIn",
+                        duration: 400,
+                        repeat:0,
+                    }
+                ],
+            })
+
         } else {
             console.log('texture error');
         }
-    }
-
-    update() {
-
     }
 }

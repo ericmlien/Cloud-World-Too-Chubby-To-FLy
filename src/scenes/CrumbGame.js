@@ -4,34 +4,57 @@ class CrumbGame extends Phaser.Scene {
     }
 
     init() {
-        this.DIFFICULTY = 1;
+        this.DIFFICULTY = this.registry.get("DIFFICULTY");
+        this.LIVES = this.registry.get("LIVES");
+        this.NUM_PLAYED = this.registry.get("NUM_PLAYED") + 1;
         this.PLAYER_VELOCITY = (20 + this.DIFFICULTY) * (20 + this.DIFFICULTY);
         this.CRUMB_SIZE = this.textures.get("rock").getSourceImage().width;
     }
 
 
     create() {
+        console.log("" + this.DIFFICULTY);
         this.cameras.main.postFX.addPixelate(0.4);
         this.cameras.main.setBackgroundColor(0xFACADE);
+
         this.player = this.physics.add.sprite(width / 2, height / 2, "character", 1).setScale(2);
         this.player.body.setCollideWorldBounds(true);
         this.player.body.setCircle(this.player.body.width / 3, this.player.body.width / 2 - this.player.body.width / 3, this.player.body.height / 4);
+        
         this.crumbGroup = this.add.group({
             runChildUpdate: true,
         });
         for (let i = 0; i < 3 + this.DIFFICULTY; i++) {
             this.spawnCrumb();
         }
+
         cursors = this.input.keyboard.createCursorKeys();
         this.physics.add.collider(this.player, this.crumbGroup, () => {
             console.log(" HII !!!");
         });
+        
         this.gameOver = false;
+        this.timeUp = false;
+
+        this.progressBar = this.add.rectangle(0, height - 30, width, 60, 0xFFF000, 1).setOrigin(0, 0.5);
+        this.progess = this.add.tween({
+            targets: this.progressBar,
+            width: 0,
+            duration: 7000 - ((this.DIFFICULTY / 2) * 1000),
+            onComplete: () => {
+                this.LIVES -= 1;
+                console.log("Lives: " + this.LIVES);
+                this.registry.set("LIVES", this.LIVES);
+                this.timeUp = true;
+            },
+            onCompleteScope: this,
+        });
+
         
     }
 
     update() {
-        if (this.checkCrumbs()){
+        if (!this.timeUp && this.checkCrumbs()){
             let playerVector = new Phaser.Math.Vector2(0, 0);
             if (cursors.left.isDown){
                 playerVector.x = -1;
@@ -50,14 +73,9 @@ class CrumbGame extends Phaser.Scene {
             // Change the background to show the fat bird smiling instead!
             // Maybe spawn some rotating sparkles or smth when you complete the sidequest
             this.gameOver = true;
-            let textureManager = this.textures;
-            this.game.renderer.snapshot((snapshotImage) => {
-                if(textureManager.exists('gamesnapshot')) {
-                    textureManager.remove('gamesnapshot');
-                }
-                textureManager.addImage('gamesnapshot', snapshotImage);
-            });
-            this.scene.start("menuScene");
+            console.log("The gameover in update is running!");
+            this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
+            this.transitionOut();
         }
         
     }
@@ -76,6 +94,23 @@ class CrumbGame extends Phaser.Scene {
             clear = false;
         }
         return clear;
+    }
+
+    transitionOut() {
+        let textureManager = this.textures;
+        this.game.renderer.snapshot((snapshotImage) => {
+            if(textureManager.exists('gamesnapshot')) {
+                textureManager.remove('gamesnapshot');
+            }
+            textureManager.addImage('gamesnapshot', snapshotImage);
+        });
+        if (this.LIVES > 0) {
+            console.log("going to transition to the transition scene!");
+            this.scene.start("transitionScene");
+        } else {
+            this.scene.start("menuScene");
+        }
+        
     }
 
 }
