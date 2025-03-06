@@ -8,6 +8,7 @@ class TailGame extends Phaser.Scene {
         this.NUM_PLAYED = this.registry.get("NUM_PLAYED") + 1;
         this.HAND_SPEED = (20 + this.DIFFICULTY) * (20 + this.DIFFICULTY);
         this.TAIL_SPEED = (20 + this.DIFFICULTY + 1) * (20 + this.DIFFICULTY + 1);
+        this.GAMES = this.registry.get("GAMES");
     }
     
     create () {
@@ -15,7 +16,11 @@ class TailGame extends Phaser.Scene {
 
         this.physics.world.setBounds(0, 0, width, height);
 
+        this.GAMES[1][1] += 1;
+        this.registry.set("GAMES", this.GAMES);
+
         this.gameOver = false;
+        this.timeUp = false;
 
         this.hand = this.physics.add.sprite(width - this.textures.get("rock").getSourceImage().width, height / 2, "rock").setCollideWorldBounds(true).setScale(1.5);
         this.tail = this.physics.add.sprite(this.textures.get("rock").getSourceImage().width, height / 2, "rock").setImmovable(true).setCollideWorldBounds(true).setBounce(1).setScale(1.5);
@@ -99,7 +104,7 @@ class TailGame extends Phaser.Scene {
     }
 
     update() {
-        if (!this.timeUp) {
+        if (!this.timeUp && !this.gameOver) {
             if (!this.grabbing) {
             let handVector = new Phaser.Math.Vector2(0, 0);
             if (cursors.up.isDown){

@@ -16,10 +16,14 @@ class Transition extends Phaser.Scene {
         let next_game_found = false;
         this.next_game = "";
         console.log ("We are now in the transition scene!" + (this.GAMES.length - 1));
+        for (let i = 0; i < this.GAMES.length; i++){
+            console.log("The " + i + "th element in GAMES is: " + this.GAMES[i][0]);
+            console.log("its playcount is: " + this.GAMES[i][1]);
+        }
         while (!next_game_found) {
             this.ROLL = Phaser.Math.Between(0, this.GAMES.length - 1);
+
             if (this.GAMES[this.ROLL][1] == this.LOWEST) {
-                this.GAMES[this.ROLL][1] += 1;
                 this.registry.set("GAMES", this.GAMES);
                 this.next_game = this.GAMES[this.ROLL][0];
                 next_game_found = true;
@@ -37,6 +41,12 @@ class Transition extends Phaser.Scene {
         };
 
         this.transitionTimer = this.time.addEvent(this.transitionTimerConfig);
+
+
+        for (let i = 1; i <= this.LIVES; i++) {
+            let life_icon = new LifeIcon(this, 60, i * (height / (this.LIVES + 1)), 1);
+        }
+
         
         this.transitionIn();
     }

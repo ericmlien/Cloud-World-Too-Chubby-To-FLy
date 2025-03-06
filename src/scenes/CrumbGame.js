@@ -9,6 +9,7 @@ class CrumbGame extends Phaser.Scene {
         this.NUM_PLAYED = this.registry.get("NUM_PLAYED") + 1;
         this.PLAYER_VELOCITY = (20 + this.DIFFICULTY) * (20 + this.DIFFICULTY);
         this.CRUMB_SIZE = this.textures.get("rock").getSourceImage().width;
+        this.GAMES = this.registry.get("GAMES");
     }
 
 
@@ -16,6 +17,8 @@ class CrumbGame extends Phaser.Scene {
         console.log("" + this.DIFFICULTY);
         this.cameras.main.postFX.addPixelate(0.4);
         this.cameras.main.setBackgroundColor(0xFACADE);
+        this.GAMES[0][1] += 1;
+        this.registry.set("GAMES", this.GAMES);
 
         this.player = this.physics.add.sprite(width / 2, height / 2, "character", 1).setScale(2);
         this.player.body.setCollideWorldBounds(true);

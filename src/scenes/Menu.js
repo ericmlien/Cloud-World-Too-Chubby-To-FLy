@@ -18,13 +18,13 @@ class Menu extends Phaser.Scene {
         this.cameras.main.setBackgroundColor(0xBEEEED);
         this.registry.set("GAMES", [
             ["crumbScene", 0],
-            ["boneScene", 0],
+            // ["boneScene", 0],
             ["tailScene", 0],
         ]);
         
         this.registry.set("DIFFICULTY", 1);
         this.registry.set("LIVES", 3);
-        this.registry.set("NUM_PLAYED", 1);
+        this.registry.set("NUM_PLAYED", 0);
         
         let buttonConfig = {
             fontFamily: "Courier",
