@@ -1,43 +1,30 @@
-class CrumbGame extends Phaser.Scene {
+class ShovelGame extends Phaser.Scene {
     constructor() {
-        super('crumbScene');
+        super("shovelScene");
     }
 
     init() {
         this.DIFFICULTY = this.registry.get("DIFFICULTY");
         this.LIVES = this.registry.get("LIVES");
         this.NUM_PLAYED = this.registry.get("NUM_PLAYED") + 1;
-        this.PLAYER_VELOCITY = (20 + this.DIFFICULTY) * (20 + this.DIFFICULTY);
-        this.CRUMB_SIZE = this.textures.get("rock").getSourceImage().width;
         this.GAMES = this.registry.get("GAMES");
     }
 
-
     create() {
-        console.log("" + this.DIFFICULTY);
-        this.cameras.main.postFX.addPixelate(0.4);
-        this.cameras.main.setBackgroundColor(0xFACADE);
-        this.GAMES[0][1] += 1;
+        this.shovel = this.add.sprite(width / 2, height / 2, "arrow").setScale(5).setOrigin(0.5, 1);
+        this.shovel.angle = -120;
+
+        this.GAMES[3][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 
-        this.player = this.physics.add.sprite(width / 2, height / 2, "character", 1).setScale(2);
-        this.player.body.setCollideWorldBounds(true);
-        this.player.body.setCircle(this.player.body.width / 3, this.player.body.width / 2 - this.player.body.width / 3, this.player.body.height / 4);
-        
-        this.crumbGroup = this.add.group({
-            runChildUpdate: true,
-        });
-        for (let i = 0; i < 3 + this.DIFFICULTY; i++) {
-            this.spawnCrumb();
-        }
+        this.cursors = this.input.keyboard.createCursorKeys();
 
-        cursors = this.input.keyboard.createCursorKeys();
-        this.physics.add.collider(this.player, this.crumbGroup, () => {
-            console.log(" HII !!!");
-        });
-        
+        this.lastKey = null;
+        this.shakes = 0;
+        this.maxShakes = 40;
         this.gameOver = false;
-        this.timeUp = false;
+
+        this.transitionIn();
 
         this.progressBar = this.add.rectangle(0, height - 30, width, 60, 0xFFF000, 1).setOrigin(0, 0.5);
         this.progess = this.add.tween({
@@ -55,53 +42,29 @@ class CrumbGame extends Phaser.Scene {
             },
             onCompleteScope: this,
         });
-
-        this.transitionIn();
-        
     }
 
     update() {
-        if (!this.timeUp && this.checkCrumbs()){
-            let playerVector = new Phaser.Math.Vector2(0, 0);
-            if (cursors.left.isDown){
-                playerVector.x = -1;
+        if (this.shakes <= this.maxShakes){
+            let pressedKey = null;
 
-            } else if (cursors.right.isDown){
-                playerVector.x = 1;
+            if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+                pressedKey = 'up';
+            } else if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
+                pressedKey = 'down';
             }
-            if (cursors.up.isDown){
-                playerVector.y = -1;
-            } else if (cursors.down.isDown){
-                playerVector.y = 1;
+
+            if (pressedKey) {
+                if (this.lastKey && this.lastKey !== pressedKey) {
+                    this.shovel.angle += pressedKey === 'up' ? -10 : 10;
+                    this.shakes++;
+                }
+                this.lastKey = pressedKey;   
             }
-            playerVector.normalize();
-            this.player.setVelocity(this.PLAYER_VELOCITY * playerVector.x, this.PLAYER_VELOCITY * playerVector.y);
-        } else if (!this.gameOver) {
-            // Change the background to show the fat bird smiling instead!
-            // Maybe spawn some rotating sparkles or smth when you complete the sidequest
-            this.timeUp = true;
+        } else if (!this.gameOver){
             this.gameOver = true;
-            console.log("The gameover in update is running!");
-            
             this.transitionOut();
         }
-        
-    }
-
-    spawnCrumb() {
-        let crumb_scale = Phaser.Math.Between(8, 12);
-        let crumb = new Crumb(this, this.CRUMB_SIZE * (crumb_scale / 10), crumb_scale / 10);
-        console.log("Width: " + crumb.width);
-        console.log("Height: " + crumb.height);
-        this.crumbGroup.add(crumb);
-    }    
-    
-    checkCrumbs() {
-        let clear = true;
-        if (this.crumbGroup.getLength() == 0){
-            clear = false;
-        }
-        return clear;
     }
 
     transitionOut() {
@@ -116,13 +79,11 @@ class CrumbGame extends Phaser.Scene {
         });
         if (this.LIVES > 0) {
             console.log("going to transition to the transition scene!");
-            this.scene.stop();
             this.scene.start("transitionScene");
         } else {
             this.scene.stop();
             this.scene.start("menuScene");
-        }
-        
+        }   
     }
 
     transitionIn() {

@@ -11,6 +11,7 @@ class Transition extends Phaser.Scene {
     }
     create() {
         this.cameras.main.setBackgroundColor(0xDAAAAB);  
+        console.log("The number of games played is: " + this.NUM_PLAYED);
         console.log("The lowest game played is: " + this.LOWEST);
         this.ROLL = 0;
         let next_game_found = false;
@@ -22,7 +23,6 @@ class Transition extends Phaser.Scene {
         }
         while (!next_game_found) {
             this.ROLL = Phaser.Math.Between(0, this.GAMES.length - 1);
-
             if (this.GAMES[this.ROLL][1] == this.LOWEST) {
                 this.registry.set("GAMES", this.GAMES);
                 this.next_game = this.GAMES[this.ROLL][0];
@@ -33,7 +33,8 @@ class Transition extends Phaser.Scene {
         this.transitionTimerConfig = {
             args: null,
             callback: () => {
-               this.transitionOut();
+                this.scene.pause();
+                this.transitionOut();
             },
             callbackScope: this,
             delay: 3000,
@@ -44,7 +45,7 @@ class Transition extends Phaser.Scene {
 
 
         for (let i = 1; i <= this.LIVES; i++) {
-            let life_icon = new LifeIcon(this, 60, i * (height / (this.LIVES + 1)), 1);
+            let life_icon = new LifeIcon(this, 60, 40 + i * (height / 7), 1.5);
         }
 
         
@@ -56,13 +57,13 @@ class Transition extends Phaser.Scene {
 
     transitionOut() {
         let textureManager = this.textures;
-            this.game.renderer.snapshot((snapshotImage) => {
-                if(textureManager.exists('gamesnapshot')) {
-                    textureManager.remove('gamesnapshot');
-                }
-                textureManager.addImage('gamesnapshot', snapshotImage);
-            });
-            this.scene.start(this.next_game);
+        this.game.renderer.snapshot((snapshotImage) => {
+            if(textureManager.exists('gamesnapshot')) {
+                textureManager.remove('gamesnapshot');
+            }
+            textureManager.addImage('gamesnapshot', snapshotImage);
+        });
+        this.scene.start(this.next_game);
     }
 
     transitionIn() {

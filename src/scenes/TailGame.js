@@ -26,15 +26,18 @@ class TailGame extends Phaser.Scene {
         this.tail = this.physics.add.sprite(this.textures.get("rock").getSourceImage().width, height / 2, "rock").setImmovable(true).setCollideWorldBounds(true).setBounce(1).setScale(1.5);
         this.tail.body.onWorldBounds = true;
 
+
+        this.stopInteraction = false;
         cursors = this.input.keyboard.createCursorKeys();
-        this.physics.add.collider(this.hand, this.tail, () => {
+        this.physics.add.overlap(this.hand, this.tail, () => {
             console.log("GRABBED!!!");
-            this.gameOver = true;
-            this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
-            this.transitionOut();
+            if (!this.stopInteraction) {
+                this.gameOver = true;
+            }
         });
 
         this.grabbing = false;
+    
 
         this.input.keyboard.on("keydown-LEFT", () => {
             if (!this.grabbing){
@@ -64,7 +67,7 @@ class TailGame extends Phaser.Scene {
                 duration: 800000 / this.TAIL_SPEED,
                 onComplete: () => {
                     this.tailDirection *= -1;
-                    this.time.delayedCall(500, moveTail, [], this);
+                    this.time.delayedCall(4000 / (this.HAND_SPEED / 2), moveTail, [], this);
                 },
             });
         }
@@ -77,15 +80,17 @@ class TailGame extends Phaser.Scene {
             width: 0,
             duration: 7000 - ((this.DIFFICULTY / 2) * 1000),
             onComplete: () => {
+                this.scene.pause();
                 this.timeUp = true;
                 this.LIVES -= 1;
                 console.log("Lives: " + this.LIVES);
                 this.registry.set("LIVES", this.LIVES);
-                this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
                 this.transitionOut();
             },
             onCompleteScope: this,
         });
+
+        this.transitionIn();
 
         // this.tailTween = this.tweens.add({
         //     targets: this.tail,
@@ -115,10 +120,16 @@ class TailGame extends Phaser.Scene {
             handVector.normalize();
             this.hand.setVelocity(0, this.HAND_SPEED * handVector.y);
             }
+        } else if (this.gameOver){
+            this.gameOver = false;
+            this.stopInteraction = true;
+            this.scene.pause();
+            this.transitionOut();
         }
     }
 
     transitionOut() {
+        this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
         this.game.renderer.snapshot((snapshotImage) => {
             if(textureManager.exists('gamesnapshot')) {
@@ -128,9 +139,61 @@ class TailGame extends Phaser.Scene {
         });
         if (this.LIVES > 0) {
             console.log("going to transition to the transition scene!");
+;
             this.scene.start("transitionScene");
         } else {
+            this.scene.stop();
             this.scene.start("menuScene");
         }   
+    }
+
+    transitionIn() {
+        if (this.textures.exists("gamesnapshot")) {
+            let screenshot = this.add.image(width / 2, height / 2, "gamesnapshot");
+            let iris = this.add.graphics()
+            iris.fillRect(0, 0, width, height).fillStyle(0x000000).lineStyle(4, 0xfacade);
+
+            const mask = iris.createGeometryMask();
+            screenshot.setMask(mask);
+            this.irisout = this.tweens.add({
+                targets: iris,
+                x: width / 2,
+                y: height / 2,
+                scale: 0,
+                ease: "linear",
+                duration: 300,
+                repeat: 0,
+                yoyo: false,
+                paused: false,
+                onComplete: () => {
+                    screenshot.destroy();
+                    iris.destroy();
+                    mask.destroy();
+                }
+            });
+
+            this.popup = this.add.image(width / 2, height / 2, "rock").setOrigin(0.5, 0.5).setScale(0);
+            this.popupout = this.tweens.chain({
+                targets: this.popup,
+                loop: 0,
+                tweens: [
+                    {
+                        scale: 2,
+                        ease: "Expo.easeOut",
+                        duration: 200,
+                        repeat: 0,
+                    },
+                    {
+                        y: -this.popup.height,
+                        ease: "Back.easeIn",
+                        duration: 400,
+                        repeat:0,
+                    }
+                ],
+            })
+
+        } else {
+            console.log('texture error');
+        }
     }
 }

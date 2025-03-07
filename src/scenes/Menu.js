@@ -18,8 +18,9 @@ class Menu extends Phaser.Scene {
         this.cameras.main.setBackgroundColor(0xBEEEED);
         this.registry.set("GAMES", [
             ["crumbScene", 0],
-            // ["boneScene", 0],
             ["tailScene", 0],
+            ["boneScene", 0],
+            ["shovelScene", 0],
         ]);
         
         this.registry.set("DIFFICULTY", 1);
@@ -94,7 +95,7 @@ class Menu extends Phaser.Scene {
             targets: this.boneButton,
             x: {
                 from: this.boneButton.x,
-                to: width - (width / 2) + 40,
+                to: (width / 2) + 40,
             },
             ease: "Cubic",
             duration: 1000,
@@ -114,6 +115,31 @@ class Menu extends Phaser.Scene {
             this.timer = this.time.delayedCall(1000, () => {this.scene.start("boneScene")});
         });
         this.transitionIn();
+
+        this.shovelButton = this.add.text(-10000, height / 2 + 100, "shovel", buttonConfig);
+        this.shovelIn = this.tweens.add({
+            targets: this.shovelButton,
+            x: {
+                from: -200,
+                to: (width / 2) - 270,
+            },
+            ease: "Cubic",
+            duration: 1000,
+            repeat: 0,
+            yoyo: false,
+        });
+        this.shovelButton.setInteractive();
+        this.shovelButton.on("pointerover", () => {
+            this.shovelButton.setBackgroundColor("#da5125");
+            this.shovelButton.setColor("#ffff8e");
+        });
+        this.shovelButton.on("pointerout", () => {
+            this.shovelButton.setBackgroundColor("#0398FC");
+            this.shovelButton.setColor("#843605");
+        });
+        this.shovelButton.on("pointerdown", () => {
+            this.timer = this.time.delayedCall(1000, () => {this.scene.start("shovelScene")});
+        });
     }
 
     update() {
