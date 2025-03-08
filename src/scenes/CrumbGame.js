@@ -20,6 +20,8 @@ class CrumbGame extends Phaser.Scene {
         this.GAMES[0][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 
+        this.transition = this.sound.add("transition");
+
         this.player = this.physics.add.sprite(width / 2, height / 2, "character", 1).setScale(2);
         this.player.body.setCollideWorldBounds(true);
         this.player.body.setCircle(this.player.body.width / 3, this.player.body.width / 2 - this.player.body.width / 3, this.player.body.height / 4);
@@ -130,7 +132,7 @@ class CrumbGame extends Phaser.Scene {
             let screenshot = this.add.image(width / 2, height / 2, "gamesnapshot");
             let iris = this.add.graphics()
             iris.fillRect(0, 0, width, height).fillStyle(0x000000).lineStyle(4, 0xfacade);
-
+            this.transition.play();
             const mask = iris.createGeometryMask();
             screenshot.setMask(mask);
             this.irisout = this.tweens.add({

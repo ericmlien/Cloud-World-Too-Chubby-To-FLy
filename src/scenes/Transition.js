@@ -13,6 +13,10 @@ class Transition extends Phaser.Scene {
         this.cameras.main.setBackgroundColor(0xDAAAAB);  
         console.log("The number of games played is: " + this.NUM_PLAYED);
         console.log("The lowest game played is: " + this.LOWEST);
+
+        this.transition = this.sound.add("transition");
+
+
         this.ROLL = 0;
         let next_game_found = false;
         this.next_game = "";
@@ -71,7 +75,7 @@ class Transition extends Phaser.Scene {
             let screenshot = this.add.image(width / 2, height / 2, "gamesnapshot");
             let iris = this.add.graphics()
             iris.fillRect(0, 0, width, height).fillStyle(0x000000).lineStyle(4, 0xfacade);
-
+            this.transition.play();
             const mask = iris.createGeometryMask();
             screenshot.setMask(mask);
             this.irisout = this.tweens.add({

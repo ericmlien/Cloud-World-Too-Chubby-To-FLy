@@ -12,6 +12,7 @@ class Menu extends Phaser.Scene {
         });
         this.load.image("rock", "./assets/rrrock.png");
         this.load.image("arrow", "./assets/arrow.png");
+        this.load.audio("transition", "./assets/Boo-womp - Sound Effect.mp3");
     }
 
     create () {
@@ -26,6 +27,8 @@ class Menu extends Phaser.Scene {
         this.registry.set("DIFFICULTY", 1);
         this.registry.set("LIVES", 3);
         this.registry.set("NUM_PLAYED", 0);
+
+        this.transition = this.sound.add("transition");
         
         let buttonConfig = {
             fontFamily: "Courier",
@@ -151,7 +154,7 @@ class Menu extends Phaser.Scene {
             let screenshot = this.add.image(width / 2, height / 2, "gamesnapshot");
             let iris = this.add.graphics()
             iris.fillRect(0, 0, width, height).fillStyle(0x000000).lineStyle(4, 0xfacade);
-
+            this.transition.play();
             const mask = iris.createGeometryMask();
             screenshot.setMask(mask);
             this.irisout = this.tweens.add({

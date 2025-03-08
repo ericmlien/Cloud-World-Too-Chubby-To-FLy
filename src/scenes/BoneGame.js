@@ -31,6 +31,8 @@ class BoneGame extends Phaser.Scene {
 
         this.physics.world.gravity.y = this.GRAVITY;
 
+        this.transition = this.sound.add("transition");
+
         // this.aim_radius = (this.BONE_SPEED ** 2) / (this.gravity * Math.cos(Phaser.Geom.Line.Angle(this.aim_line)));
 
         this.throwing = false;     
@@ -145,7 +147,7 @@ class BoneGame extends Phaser.Scene {
             let screenshot = this.add.image(width / 2, height / 2, "gamesnapshot");
             let iris = this.add.graphics()
             iris.fillRect(0, 0, width, height).fillStyle(0x000000).lineStyle(4, 0xfacade);
-
+            this.transition.play();
             const mask = iris.createGeometryMask();
             screenshot.setMask(mask);
             this.irisout = this.tweens.add({
