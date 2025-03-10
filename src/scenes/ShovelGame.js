@@ -19,6 +19,8 @@ class ShovelGame extends Phaser.Scene {
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
+        this.transition = this.sound.add("transition");
+
         this.lastKey = null;
         this.shakes = 0;
         this.maxShakes = 40;
@@ -93,7 +95,7 @@ class ShovelGame extends Phaser.Scene {
             let screenshot = this.add.image(width / 2, height / 2, "gamesnapshot");
             let iris = this.add.graphics()
             iris.fillRect(0, 0, width, height).fillStyle(0x000000).lineStyle(4, 0xfacade);
-
+            this.transition.play();
             const mask = iris.createGeometryMask();
             screenshot.setMask(mask);
             this.irisout = this.tweens.add({
