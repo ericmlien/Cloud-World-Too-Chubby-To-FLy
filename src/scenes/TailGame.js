@@ -80,8 +80,8 @@ class TailGame extends Phaser.Scene {
             width: 0,
             duration: 7000 - ((this.DIFFICULTY / 2) * 1000),
             onComplete: () => {
-                this.scene.pause();
                 this.timeUp = true;
+                this.gameOver = true;
                 this.LIVES -= 1;
                 console.log("Lives: " + this.LIVES);
                 this.registry.set("LIVES", this.LIVES);
@@ -123,12 +123,12 @@ class TailGame extends Phaser.Scene {
         } else if (this.gameOver){
             this.gameOver = false;
             this.stopInteraction = true;
-            this.scene.pause();
             this.transitionOut();
         }
     }
 
     transitionOut() {
+        this.scene.pause();
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
         this.game.renderer.snapshot((snapshotImage) => {
@@ -137,14 +137,15 @@ class TailGame extends Phaser.Scene {
             }
             textureManager.addImage('gamesnapshot', snapshotImage);
         });
-        if (this.LIVES > 0) {
-            console.log("going to transition to the transition scene!");
-;
-            this.scene.start("transitionScene");
-        } else {
-            this.scene.stop();
-            this.scene.start("menuScene");
-        }   
+        requestAnimationFrame(() => {
+            if (this.LIVES > 0) {
+                console.log("going to transition to the transition scene!");
+                this.scene.start("transitionScene");
+            } else {
+                this.scene.stop();
+                this.scene.start("menuScene");
+            }
+        });
     }
 
     transitionIn() {

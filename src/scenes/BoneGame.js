@@ -119,22 +119,24 @@ class BoneGame extends Phaser.Scene {
     }
 
     transitionOut() {
+        this.scene.pause();
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
-
         this.game.renderer.snapshot((snapshotImage) => {
             if(textureManager.exists('gamesnapshot')) {
                 textureManager.remove('gamesnapshot');
             }
             textureManager.addImage('gamesnapshot', snapshotImage);
         });
-        if (this.LIVES > 0) {
-            console.log("going to transition to the transition scene!");
-            
-            this.scene.start("transitionScene");
-        } else {
-            this.scene.start("menuScene");
-        }   
+        requestAnimationFrame(() => {
+            if (this.LIVES > 0) {
+                console.log("going to transition to the transition scene!");
+                this.scene.start("transitionScene");
+            } else {
+                this.scene.stop();
+                this.scene.start("menuScene");
+            }
+        });
     }
     // update_line() {
     //     this.aim_line.setTo(this.arrow.getBottomCenter().x, this.arrow.getBottomCenter().y, this.arrow.getTopCenter().x, this.arrow.getTopCenter().y);

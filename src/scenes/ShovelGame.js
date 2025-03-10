@@ -77,13 +77,15 @@ class ShovelGame extends Phaser.Scene {
             }
             textureManager.addImage('gamesnapshot', snapshotImage);
         });
-        if (this.LIVES > 0) {
-            console.log("going to transition to the transition scene!");
-            this.scene.start("transitionScene");
-        } else {
-            this.scene.stop();
-            this.scene.start("menuScene");
-        }   
+        requestAnimationFrame(() => {
+            if (this.LIVES > 0) {
+                console.log("going to transition to the transition scene!");
+                this.scene.start("transitionScene");
+            } else {
+                this.scene.stop();
+                this.scene.start("menuScene");
+            }
+        });
     }
 
     transitionIn() {
