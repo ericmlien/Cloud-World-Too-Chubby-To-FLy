@@ -8,6 +8,7 @@ class ShovelGame extends Phaser.Scene {
         this.LIVES = this.registry.get("LIVES");
         this.NUM_PLAYED = this.registry.get("NUM_PLAYED") + 1;
         this.GAMES = this.registry.get("GAMES");
+        this.LOWEST = Math.floor(this.NUM_PLAYED / this.GAMES.length);
     }
 
     create() {
@@ -20,21 +21,23 @@ class ShovelGame extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.transition = this.sound.add("transition");
+        this.win = false;
 
         this.lastKey = null;
         this.shakes = 0;
-        this.maxShakes = 40;
+        this.maxShakes = Math.round(25 + 0.5 *  Math.pow(this.NUM_PLAYED, 1.05));
+        console.log("Max Shakes: " + this.maxShakes)
         this.gameOver = false;
 
+        this.transitioning = false;
         this.transitionIn();
 
         this.progressBar = this.add.rectangle(0, height - 30, width, 60, 0xFFF000, 1).setOrigin(0, 0.5);
         this.progess = this.add.tween({
             targets: this.progressBar,
             width: 0,
-            duration: 7000 - ((this.DIFFICULTY / 2) * 1000),
+            duration: 7000 - Math.pow(this.LOWEST, 1.3) > 3000 ? 7000 - Math.pow(this.LOWEST, 1.3) : 3000,
             onComplete: () => {
-                this.scene.pause();
                 this.gameOver = true;
                 this.timeUp = true;
                 this.LIVES -= 1;
@@ -47,7 +50,10 @@ class ShovelGame extends Phaser.Scene {
     }
 
     update() {
-        if (this.shakes <= this.maxShakes){
+        if (this.shakes > this.maxShakes || this.gameOver) {
+            this.win = true;
+            this.transitionOut();
+        } else if (this.shakes <= this.maxShakes && !this.gameOver){
             let pressedKey = null;
 
             if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
@@ -63,30 +69,32 @@ class ShovelGame extends Phaser.Scene {
                 }
                 this.lastKey = pressedKey;   
             }
-        } else if (!this.gameOver){
-            this.gameOver = true;
-            this.transitionOut();
         }
     }
 
     transitionOut() {
+        if (this.transitioning) return;
         this.scene.pause();
+        this.transitioning = true;
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
         this.game.renderer.snapshot((snapshotImage) => {
-            if(textureManager.exists('gamesnapshot')) {
+            if (textureManager.exists('gamesnapshot')) {
                 textureManager.remove('gamesnapshot');
             }
             textureManager.addImage('gamesnapshot', snapshotImage);
-        });
-        requestAnimationFrame(() => {
-            if (this.LIVES > 0) {
-                console.log("going to transition to the transition scene!");
-                this.scene.start("transitionScene");
-            } else {
-                this.scene.stop();
-                this.scene.start("menuScene");
-            }
+            
+            requestAnimationFrame(() => {
+                if (this.win) {
+                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                }
+                if (this.LIVES > 0) {
+                    console.log("going to transition to the transition scene!");
+                    this.scene.start("transitionScene");
+                } else {
+                    this.registry.set("GAME_SCORE", 0);
+                    this.scene.start("menuScene");
+                }
+            });
         });
     }
 
@@ -139,5 +147,4 @@ class ShovelGame extends Phaser.Scene {
             console.log('texture error');
         }
     }
-
 }

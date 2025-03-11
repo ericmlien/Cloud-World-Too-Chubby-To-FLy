@@ -13,6 +13,7 @@ class Menu extends Phaser.Scene {
         this.load.image("rock", "./assets/rrrock.png");
         this.load.image("arrow", "./assets/arrow.png");
         this.load.audio("transition", "./assets/Boo-womp - Sound Effect.mp3");
+        this.load.font("puppycat", "./assets/puppycat.ttf");
     }
 
     create () {
@@ -27,6 +28,8 @@ class Menu extends Phaser.Scene {
         this.registry.set("DIFFICULTY", 1);
         this.registry.set("LIVES", 3);
         this.registry.set("NUM_PLAYED", 0);
+        this.registry.set("GAME_SCORE", 0);
+        this.registry.set("RUNNING_SCORE", 0);
 
         this.transition = this.sound.add("transition");
         

@@ -34,16 +34,6 @@ class Transition extends Phaser.Scene {
             }
         }
 
-        this.transitionTimerConfig = {
-            args: null,
-            callback: () => {
-                this.scene.pause();
-                this.transitionOut();
-            },
-            callbackScope: this,
-            delay: 3000,
-            loop: false,
-        };
 
         this.transitionTimer = this.time.addEvent(this.transitionTimerConfig);
 
@@ -52,7 +42,36 @@ class Transition extends Phaser.Scene {
             let life_icon = new LifeIcon(this, 60, 40 + i * (height / 7), 1.5);
         }
 
-        
+        let scoreConfig = {
+            fontFamily: "puppycat",
+            fontSize:"48px",
+            color: "#BEEAAD",
+            align: "center",
+        }
+
+        this.runningScore = this.registry.get("RUNNING_SCORE");
+        this.gameScore = this.registry.get("GAME_SCORE");
+
+        this.scoreCounter = this.add.text(width / 2, height / 2, this.runningScore, scoreConfig).setOrigin(0.5);
+
+        this.scoreCountUp = this.tweens.add({
+            targets: {
+                value: this.runningScore,
+            },
+            value: this.runningScore + this.gameScore,
+            duration: 2000,
+            ease: "Cubic.easeInOut",
+            repeat: false,
+            onUpdate: (tween) => {
+                this.scoreCounter.setText(Math.floor(tween.getValue()));
+            },
+            onComplete: () => {
+                this.registry.set("RUNNING_SCORE", this.runningScore + this.gameScore);
+                this.scene.pause();
+                this.transitionOut();
+            }
+        })
+
         this.transitionIn();
     }
     update() {
@@ -62,12 +81,14 @@ class Transition extends Phaser.Scene {
     transitionOut() {
         let textureManager = this.textures;
         this.game.renderer.snapshot((snapshotImage) => {
-            if(textureManager.exists('gamesnapshot')) {
+            if (textureManager.exists('gamesnapshot')) {
                 textureManager.remove('gamesnapshot');
             }
             textureManager.addImage('gamesnapshot', snapshotImage);
         });
-        this.scene.start(this.next_game);
+        requestAnimationFrame(() => {
+            this.scene.start(this.next_game);
+        });
     }
 
     transitionIn() {

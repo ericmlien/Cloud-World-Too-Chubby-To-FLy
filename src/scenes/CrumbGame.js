@@ -10,6 +10,8 @@ class CrumbGame extends Phaser.Scene {
         this.PLAYER_VELOCITY = (20 + this.DIFFICULTY) * (20 + this.DIFFICULTY);
         this.CRUMB_SIZE = this.textures.get("rock").getSourceImage().width;
         this.GAMES = this.registry.get("GAMES");
+        this.LOWEST = Math.floor(this.NUM_PLAYED / this.GAMES.length);
+
     }
 
 
@@ -29,7 +31,7 @@ class CrumbGame extends Phaser.Scene {
         this.crumbGroup = this.add.group({
             runChildUpdate: true,
         });
-        for (let i = 0; i < 3 + this.DIFFICULTY; i++) {
+        for (let i = 0; i < 3 + Math.floor(this.NUM_PLAYED * 0.2); i++) {
             this.spawnCrumb();
         }
 
@@ -40,14 +42,14 @@ class CrumbGame extends Phaser.Scene {
         
         this.gameOver = false;
         this.timeUp = false;
+        this.win = false;
 
         this.progressBar = this.add.rectangle(0, height - 30, width, 60, 0xFFF000, 1).setOrigin(0, 0.5);
         this.progess = this.add.tween({
             targets: this.progressBar,
             width: 0,
-            duration: 7000 - ((this.DIFFICULTY / 2) * 1000),
+            duration: 7000 - Math.pow(this.LOWEST, 1.3) > 3000 ? 7000 - Math.pow(this.LOWEST, 1.3) : 3000,
             onComplete: () => {
-                this.scene.pause();
                 this.gameOver = true;
                 this.timeUp = true;
                 this.LIVES -= 1;
@@ -58,6 +60,7 @@ class CrumbGame extends Phaser.Scene {
             onCompleteScope: this,
         });
 
+        this.transitioning = false;
         this.transitionIn();
         
     }
@@ -84,7 +87,7 @@ class CrumbGame extends Phaser.Scene {
             this.timeUp = true;
             this.gameOver = true;
             console.log("The gameover in update is running!");
-            
+            this.win = true;
             this.transitionOut();
         }
         
@@ -107,25 +110,31 @@ class CrumbGame extends Phaser.Scene {
     }
 
     transitionOut() {
+        if (this.transitioning) return;
         this.scene.pause();
+        this.transitioning = true;
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
         this.game.renderer.snapshot((snapshotImage) => {
-            if(textureManager.exists('gamesnapshot')) {
+            if (textureManager.exists('gamesnapshot')) {
                 textureManager.remove('gamesnapshot');
             }
             textureManager.addImage('gamesnapshot', snapshotImage);
-        });
-        requestAnimationFrame(() => {
-            if (this.LIVES > 0) {
-                console.log("going to transition to the transition scene!");
-                this.scene.start("transitionScene");
-            } else {
-                this.scene.stop();
-                this.scene.start("menuScene");
-            }
+            
+            requestAnimationFrame(() => {
+                if (this.win) {
+                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                }
+                if (this.LIVES > 0) {
+                    console.log("going to transition to the transition scene!");
+                    this.scene.start("transitionScene");
+                } else {
+                    this.registry.set("GAME_SCORE", 0);
+                    this.scene.start("menuScene");
+                }
+            });
         });
     }
+
 
     transitionIn() {
         if (this.textures.exists("gamesnapshot")) {

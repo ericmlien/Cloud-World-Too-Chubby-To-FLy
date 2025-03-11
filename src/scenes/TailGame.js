@@ -6,9 +6,11 @@ class TailGame extends Phaser.Scene {
         this.DIFFICULTY = this.registry.get("DIFFICULTY");
         this.LIVES = this.registry.get("LIVES");
         this.NUM_PLAYED = this.registry.get("NUM_PLAYED") + 1;
-        this.HAND_SPEED = (20 + this.DIFFICULTY) * (20 + this.DIFFICULTY);
+        this.HAND_SPEED = 400;
         this.TAIL_SPEED = (20 + this.DIFFICULTY + 1) * (20 + this.DIFFICULTY + 1);
         this.GAMES = this.registry.get("GAMES");
+        this.LOWEST = Math.floor(this.NUM_PLAYED / this.GAMES.length);
+
     }
     
     create () {
@@ -23,6 +25,7 @@ class TailGame extends Phaser.Scene {
 
         this.gameOver = false;
         this.timeUp = false;
+        this.win = false;
 
         this.hand = this.physics.add.sprite(width - this.textures.get("rock").getSourceImage().width, height / 2, "rock").setCollideWorldBounds(true).setScale(1.5);
         this.tail = this.physics.add.sprite(this.textures.get("rock").getSourceImage().width, height / 2, "rock").setImmovable(true).setCollideWorldBounds(true).setBounce(1).setScale(1.5);
@@ -34,6 +37,7 @@ class TailGame extends Phaser.Scene {
         this.physics.add.overlap(this.hand, this.tail, () => {
             console.log("GRABBED!!!");
             if (!this.stopInteraction) {
+                this.win = true;
                 this.gameOver = true;
             }
         });
@@ -45,14 +49,15 @@ class TailGame extends Phaser.Scene {
             if (!this.grabbing){
                 this.grabbing = true;
                 this.hand.setVelocityY(0);
-                this.grabTimer = this.time.delayedCall(80000 / (this.HAND_SPEED / 2), () => {this.grabbing = false});
+                this.HAND_SPEED = 200;
+                this.grabTimer = this.time.delayedCall(600, () => {this.grabbing = false; this.HAND_SPEED = 400});
                 this.grabTween = this.tweens.add({
                     targets: this.hand,
                     x: {
                         from: width,
                         to: this.hand.width + this.tail.width,
                     },
-                    duration: 80000 / (this.HAND_SPEED / 2),
+                    duration: 600,
                     repeat: 0,
                     yoyo: true,
                 });
@@ -66,7 +71,7 @@ class TailGame extends Phaser.Scene {
                 targets: this.tail,
                 y: this.tailMoveTo,
                 ease: "Back.easeOut",
-                duration: 800000 / this.TAIL_SPEED,
+                duration: Math.max(600, 1300 - 0.5 * Math.pow(this.LOWEST, 1.2)),
                 onComplete: () => {
                     this.tailDirection *= -1;
                     this.time.delayedCall(4000 / (this.HAND_SPEED / 2), moveTail, [], this);
@@ -80,10 +85,10 @@ class TailGame extends Phaser.Scene {
         this.progess = this.add.tween({
             targets: this.progressBar,
             width: 0,
-            duration: 7000 - ((this.DIFFICULTY / 2) * 1000),
+            duration: 8000 - Math.pow(this.LOWEST, 1.3) > 3000 ? 8000 - Math.pow(this.LOWEST, 1.3) : 3000,
             onComplete: () => {
-                this.timeUp = true;
                 this.gameOver = true;
+                this.timeUp = true;
                 this.LIVES -= 1;
                 console.log("Lives: " + this.LIVES);
                 this.registry.set("LIVES", this.LIVES);
@@ -92,6 +97,7 @@ class TailGame extends Phaser.Scene {
             onCompleteScope: this,
         });
 
+        this.transitioning = false;
         this.transitionIn();
 
         // this.tailTween = this.tweens.add({
@@ -112,7 +118,6 @@ class TailGame extends Phaser.Scene {
 
     update() {
         if (!this.timeUp && !this.gameOver) {
-            if (!this.grabbing) {
             let handVector = new Phaser.Math.Vector2(0, 0);
             if (cursors.up.isDown){
                 handVector.y = -1;
@@ -121,32 +126,38 @@ class TailGame extends Phaser.Scene {
             }
             handVector.normalize();
             this.hand.setVelocity(0, this.HAND_SPEED * handVector.y);
-            }
         } else if (this.gameOver){
             this.gameOver = false;
             this.stopInteraction = true;
+            this.win = true;
             this.transitionOut();
         }
     }
 
     transitionOut() {
+        if (this.transitioning) return;
         this.scene.pause();
+        this.transitioning = true;
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
         this.game.renderer.snapshot((snapshotImage) => {
-            if(textureManager.exists('gamesnapshot')) {
+            if (textureManager.exists('gamesnapshot')) {
                 textureManager.remove('gamesnapshot');
             }
             textureManager.addImage('gamesnapshot', snapshotImage);
-        });
-        requestAnimationFrame(() => {
-            if (this.LIVES > 0) {
-                console.log("going to transition to the transition scene!");
-                this.scene.start("transitionScene");
-            } else {
-                this.scene.stop();
-                this.scene.start("menuScene");
-            }
+            
+            requestAnimationFrame(() => {
+                if (this.win) {
+                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));
+                }
+                if (this.LIVES > 0) {
+                    console.log("going to transition to the transition scene!");
+                    this.scene.start("transitionScene");
+                } else {
+                    this.registry.set("GAME_SCORE", 0);
+                    this.scene.start("menuScene");
+                }
+            });
         });
     }
 

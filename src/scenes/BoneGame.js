@@ -7,11 +7,12 @@ class BoneGame extends Phaser.Scene {
         this.LIVES = this.registry.get("LIVES");
         this.NUM_PLAYED = this.registry.get("NUM_PLAYED") + 1;
         this.GAMES = this.registry.get("GAMES");
+        this.LOWEST = Math.floor(this.NUM_PLAYED / this.GAMES.length);
         this.GRAVITY = 700 * (this.DIFFICULTY / 2);
         this.BONE_SPEED =  2400 * (this.DIFFICULTY / 2);
         this.ARROW_SPEED = 1.4 * (this.DIFFICULTY / 2);
         this.ARROW_DIRECTION = 1;
-        this.TURN_DELAY = 800 / this.ARROW_SPEED;
+        this.TURN_DELAY = 1200 / this.ARROW_SPEED;
     }
     create() {
 
@@ -54,9 +55,9 @@ class BoneGame extends Phaser.Scene {
         this.progess = this.add.tween({
             targets: this.progressBar,
             width: 0,
-            duration: 7000 - ((this.DIFFICULTY / 2) * 1000),
+            duration: 7000 - Math.pow(this.LOWEST, 1.3) > 3000 ? 7000 - Math.pow(this.LOWEST, 1.3) : 3000,
             onComplete: () => {
-                this.scene.pause();
+                this.gameOver = true;
                 this.timeUp = true;
                 this.LIVES -= 1;
                 console.log("Lives: " + this.LIVES);
@@ -82,12 +83,13 @@ class BoneGame extends Phaser.Scene {
         });
 
         this.hit = false;
+        this.win = false;
         
         this.physics.add.overlap(this.receiver, this.bone, () => {
             this.hit = true;
         });
 
-
+        this.transitioning = false;
         this.transitionIn();
 
 
@@ -111,6 +113,7 @@ class BoneGame extends Phaser.Scene {
             }
         } else {
             this.hit = false;
+            this.win = true;
             this.scene.pause();
             this.transitionOut();
         }
@@ -121,25 +124,31 @@ class BoneGame extends Phaser.Scene {
     }
 
     transitionOut() {
+        if (this.transitioning) return;
         this.scene.pause();
+        this.transitioning = true;
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
         this.game.renderer.snapshot((snapshotImage) => {
-            if(textureManager.exists('gamesnapshot')) {
+            if (textureManager.exists('gamesnapshot')) {
                 textureManager.remove('gamesnapshot');
             }
             textureManager.addImage('gamesnapshot', snapshotImage);
-        });
-        requestAnimationFrame(() => {
-            if (this.LIVES > 0) {
-                console.log("going to transition to the transition scene!");
-                this.scene.start("transitionScene");
-            } else {
-                this.scene.stop();
-                this.scene.start("menuScene");
-            }
+            
+            requestAnimationFrame(() => {
+                if (this.win) {
+                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                }
+                if (this.LIVES > 0) {
+                    console.log("going to transition to the transition scene!");
+                    this.scene.start("transitionScene");
+                } else {
+                    this.registry.set("GAME_SCORE", 0);
+                    this.scene.start("menuScene");
+                }
+            });
         });
     }
+
     // update_line() {
     //     this.aim_line.setTo(this.arrow.getBottomCenter().x, this.arrow.getBottomCenter().y, this.arrow.getTopCenter().x, this.arrow.getTopCenter().y);
     // }
