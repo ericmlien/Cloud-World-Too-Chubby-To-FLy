@@ -123,20 +123,20 @@ class ShovelGame extends Phaser.Scene {
                 }
             });
 
-            this.popup = this.add.image(width / 2, height / 2, "rock").setOrigin(0.5, 0.5).setScale(0);
+            this.popup = this.add.image(width / 2, height / 2, "mash").setOrigin(0.5, 0.5).setScale(0);
             this.popupout = this.tweens.chain({
                 targets: this.popup,
                 loop: 0,
                 tweens: [
                     {
-                        scale: 2,
+                        scale: 0.3,
                         ease: "Expo.easeOut",
-                        duration: 200,
+                        duration: 600,
                         repeat: 0,
                     },
                     {
                         y: -this.popup.height,
-                        ease: "Back.easeIn",
+                        ease: "Expo.easeIn",
                         duration: 400,
                         repeat:0,
                     }
