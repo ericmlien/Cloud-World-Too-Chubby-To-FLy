@@ -40,6 +40,7 @@ class ShovelGame extends Phaser.Scene {
             onComplete: () => {
                 this.gameOver = true;
                 this.timeUp = true;
+                this.win = false;
                 this.LIVES -= 1;
                 console.log("Lives: " + this.LIVES);
                 this.registry.set("LIVES", this.LIVES);
@@ -50,7 +51,7 @@ class ShovelGame extends Phaser.Scene {
     }
 
     update() {
-        if (this.shakes > this.maxShakes || this.gameOver) {
+        if (this.shakes > this.maxShakes) {
             this.win = true;
             this.transitionOut();
         } else if (this.shakes <= this.maxShakes && !this.gameOver){
@@ -86,14 +87,14 @@ class ShovelGame extends Phaser.Scene {
             
             requestAnimationFrame(() => {
                 if (this.win) {
-                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                
-                }
-                if (this.LIVES > 0) {
-                    console.log("going to transition to the transition scene!");
-                    this.scene.start("transitionScene");
+                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));
                 } else {
                     this.registry.set("GAME_SCORE", 0);
-                    this.scene.start("menuScene");
+                }
+                if (this.LIVES == 0) {
+                    this.scene.start("gameoverScene");
+                } else {
+                    this.scene.start("transitionScene");
                 }
             });
         });

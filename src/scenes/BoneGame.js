@@ -139,14 +139,14 @@ class BoneGame extends Phaser.Scene {
             
             requestAnimationFrame(() => {
                 if (this.win) {
-                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                
-                }
-                if (this.LIVES > 0) {
-                    console.log("going to transition to the transition scene!");
-                    this.scene.start("transitionScene");
+                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));
                 } else {
                     this.registry.set("GAME_SCORE", 0);
-                    this.scene.start("menuScene");
+                }
+                if (this.LIVES == 0) {
+                    this.scene.start("gameoverScene");
+                } else {
+                    this.scene.start("transitionScene");
                 }
             });
         });

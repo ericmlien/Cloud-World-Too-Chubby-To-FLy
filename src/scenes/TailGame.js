@@ -25,7 +25,7 @@ class TailGame extends Phaser.Scene {
 
         this.gameOver = false;
         this.timeUp = false;
-        this.win = false;
+        this.win = true;
 
         this.hand = this.physics.add.sprite(width - this.textures.get("rock").getSourceImage().width, height / 2, "rock").setCollideWorldBounds(true).setScale(1.5);
         this.tail = this.physics.add.sprite(this.textures.get("rock").getSourceImage().width, height / 2, "rock").setImmovable(true).setCollideWorldBounds(true).setBounce(1).setScale(1.5);
@@ -89,6 +89,7 @@ class TailGame extends Phaser.Scene {
             onComplete: () => {
                 this.gameOver = true;
                 this.timeUp = true;
+                this.win = false;
                 this.LIVES -= 1;
                 console.log("Lives: " + this.LIVES);
                 this.registry.set("LIVES", this.LIVES);
@@ -129,7 +130,6 @@ class TailGame extends Phaser.Scene {
         } else if (this.gameOver){
             this.gameOver = false;
             this.stopInteraction = true;
-            this.win = true;
             this.transitionOut();
         }
     }
@@ -149,13 +149,13 @@ class TailGame extends Phaser.Scene {
             requestAnimationFrame(() => {
                 if (this.win) {
                     this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));
-                }
-                if (this.LIVES > 0) {
-                    console.log("going to transition to the transition scene!");
-                    this.scene.start("transitionScene");
                 } else {
                     this.registry.set("GAME_SCORE", 0);
-                    this.scene.start("menuScene");
+                }
+                if (this.LIVES == 0) {
+                    this.scene.start("gameoverScene");
+                } else {
+                    this.scene.start("transitionScene");
                 }
             });
         });

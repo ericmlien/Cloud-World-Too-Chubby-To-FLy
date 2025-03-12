@@ -16,7 +16,6 @@ class Transition extends Phaser.Scene {
 
         this.transition = this.sound.add("transition");
 
-
         this.ROLL = 0;
         let next_game_found = false;
         this.next_game = "";

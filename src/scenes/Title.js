@@ -26,6 +26,8 @@ class Title extends Phaser.Scene {
 
     create() {
         this.cameras.main.setBackgroundColor(0xBEEEED);
+        this.cameras.main.postFX.addPixelate(1);
+
         this.registry.set("GAMES", [
             ["crumbScene", 0],
             ["tailScene", 0],
