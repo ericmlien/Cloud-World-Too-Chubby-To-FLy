@@ -123,7 +123,8 @@ class CrumbGame extends Phaser.Scene {
             
             requestAnimationFrame(() => {
                 if (this.win) {
-                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                }
+                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                
+                }
                 if (this.LIVES > 0) {
                     console.log("going to transition to the transition scene!");
                     this.scene.start("transitionScene");
@@ -161,25 +162,25 @@ class CrumbGame extends Phaser.Scene {
                 }
             });
 
-            this.popup = this.add.image(width / 2, height / 2, "rock").setOrigin(0.5, 0.5).setScale(0);
+            this.popup = this.add.image(width / 2, height / 2, "clean").setOrigin(0.5, 0.5).setScale(0);
             this.popupout = this.tweens.chain({
                 targets: this.popup,
                 loop: 0,
                 tweens: [
                     {
-                        scale: 2,
+                        scale: 0.27,
                         ease: "Expo.easeOut",
-                        duration: 200,
+                        duration: 600,
                         repeat: 0,
                     },
                     {
                         y: -this.popup.height,
-                        ease: "Back.easeIn",
+                        ease: "Expo.easeIn",
                         duration: 400,
                         repeat:0,
                     }
                 ],
-            })
+            });
 
         } else {
             console.log('texture error');

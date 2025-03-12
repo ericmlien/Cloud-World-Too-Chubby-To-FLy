@@ -67,6 +67,7 @@ class Transition extends Phaser.Scene {
             },
             onComplete: () => {
                 this.registry.set("RUNNING_SCORE", this.runningScore + this.gameScore);
+                this.registry.set("GAME_SCORE", 0);
                 this.scene.pause();
                 this.transitionOut();
             }

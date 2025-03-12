@@ -181,7 +181,7 @@ class BoneGame extends Phaser.Scene {
                 }
             });
 
-            this.popup = this.add.image(width / 2, height / 2, "toss").setOrigin(0.5, 0.5).setScale(0);
+            this.popup = this.add.image(width / 2 - 40, height / 2, "toss").setOrigin(0.5, 0.5).setScale(0);
             this.popupout = this.tweens.chain({
                 targets: this.popup,
                 loop: 0,

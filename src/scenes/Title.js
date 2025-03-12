@@ -18,8 +18,10 @@ class Title extends Phaser.Scene {
         this.load.image("rightTitleCloud", "./assets/rightTitleCloud.png");
         this.load.image("centerTitleCloud", "./assets/centerTitleCloud.png");
         this.load.image("startButton", "./assets/StartButton.png");
-        this.load.image("mash", "./assets/Mash!.png");
+        this.load.image("shake", "./assets/Shake!.png");
         this.load.image("toss", "./assets/Toss!.png");
+        this.load.image("reach", "./assets/Reach!.png");
+        this.load.image("clean", "./assets/Clean!.png");
     }
 
     create() {
