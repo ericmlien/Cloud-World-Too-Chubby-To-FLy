@@ -86,7 +86,8 @@ class ShovelGame extends Phaser.Scene {
             
             requestAnimationFrame(() => {
                 if (this.win) {
-                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                }
+                    this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));                
+                }
                 if (this.LIVES > 0) {
                     console.log("going to transition to the transition scene!");
                     this.scene.start("transitionScene");
@@ -141,7 +142,7 @@ class ShovelGame extends Phaser.Scene {
                         repeat:0,
                     }
                 ],
-            })
+            });
 
         } else {
             console.log('texture error');

@@ -19,6 +19,7 @@ class Title extends Phaser.Scene {
         this.load.image("centerTitleCloud", "./assets/centerTitleCloud.png");
         this.load.image("startButton", "./assets/StartButton.png");
         this.load.image("mash", "./assets/Mash!.png");
+        this.load.image("toss", "./assets/Toss!.png");
     }
 
     create() {
