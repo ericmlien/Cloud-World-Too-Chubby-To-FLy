@@ -6,31 +6,11 @@ class Menu extends Phaser.Scene {
         this.DIFFICULTY = 1;
     }
     
-    preload() {
-        this.load.spritesheet("character", "./assets/spritesheets/Character_002.png",{
-            frameWidth: 48,
-        });
-        this.load.image("rock", "./assets/rrrock.png");
-        this.load.image("arrow", "./assets/arrow.png");
-        this.load.audio("transition", "./assets/Boo-womp - Sound Effect.mp3");
-        this.load.font("puppycat", "./assets/puppycat.ttf");
-    }
+   
 
     create () {
         this.cameras.main.setBackgroundColor(0xBEEEED);
-        this.registry.set("GAMES", [
-            ["crumbScene", 0],
-            ["tailScene", 0],
-            ["boneScene", 0],
-            ["shovelScene", 0],
-        ]);
         
-        this.registry.set("DIFFICULTY", 1);
-        this.registry.set("LIVES", 3);
-        this.registry.set("NUM_PLAYED", 0);
-        this.registry.set("GAME_SCORE", 0);
-        this.registry.set("RUNNING_SCORE", 0);
-
         this.transition = this.sound.add("transition");
         
         let buttonConfig = {
