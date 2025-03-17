@@ -19,7 +19,8 @@ class BoneGame extends Phaser.Scene {
         this.GAMES[2][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 
-        this.cameras.main.setBackgroundColor(0xDDDDDD);
+         this.background = this.add.image(0, height - height / 3, "titleBackground").setScale(1);
+
 
         this.player = this.add.sprite(Phaser.Math.Between(width - (width / 4), width), Phaser.Math.Between(height - (height / 4), height), "thrower", 0).setScale(0.5);
         this.arrow = this.add.sprite(this.player.x - 30, this.player.getTopCenter().y + 40, "arrow").setScale(1).setOrigin(0.5, 2);
@@ -32,7 +33,7 @@ class BoneGame extends Phaser.Scene {
         this.receiverOffsetX = Phaser.Math.Between(200, this.arrow.x - width / 2);
         this.receiver = this.add.sprite(this.receiverOffsetX, height - (height - this.receiverOffsetX), "receiver", 0).setScale(0.5);
         this.physics.add.existing(this.receiver);
-        this.receiver.body.setSize(this.receiver.width / 3, this.receiver.height / 3).setOffset(140, 50);
+        this.receiver.body.setSize(this.receiver.width / 4, this.receiver.height / 4).setOffset(155, 50);
         this.receiver.body.setAllowGravity(false).setImmovable(true);
 
 
@@ -132,7 +133,7 @@ class BoneGame extends Phaser.Scene {
     update() {
         if (!this.hit) {
             this.arrow.angle += (this.ARROW_SPEED * this.ARROW_DIRECTION);
-            if (this.bone.x < 0) {
+            if (this.bone.x < 0 || this.bone.y < 0) {
                 this.bone.anims.stop("fly");
                 this.player.setFrame(0);
                 this.throwing = false;
