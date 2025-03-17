@@ -20,14 +20,35 @@ class BoneGame extends Phaser.Scene {
         this.registry.set("GAMES", this.GAMES);
 
         this.cameras.main.setBackgroundColor(0xDDDDDD);
-        this.arrow = this.add.sprite(Phaser.Math.Between(width - (width / 4), width), Phaser.Math.Between(height - (height / 4), height), "arrow").setScale(1).setOrigin(0.5, 2);
-        this.player = this.add.sprite(this.arrow.x - (this.arrow.width / 4), this.arrow.y - (this.arrow.height / 8), "rock");
+
+        this.player = this.add.sprite(Phaser.Math.Between(width - (width / 4), width), Phaser.Math.Between(height - (height / 4), height), "thrower", 0).setScale(0.5);
+        this.arrow = this.add.sprite(this.player.x - 30, this.player.getTopCenter().y + 40, "arrow").setScale(1).setOrigin(0.5, 2);
+        console.log("Arrow y: " + this.arrow.y);
+        console.log("Arrow x: " + this.arrow.x);
         this.arrow.angle = -90;
-        this.bone = this.physics.add.sprite(width + this.textures.get("rock").getSourceImage().width, height + 200, "rock").setBounce(1).setScale(1).setDrag(0.5).setDamping(true);
-        this.bone.body.setAllowGravity(false);
+
+
+
         this.receiverOffsetX = Phaser.Math.Between(200, this.arrow.x - width / 2);
-        this.receiver = this.physics.add.sprite(this.receiverOffsetX, height - (height - this.receiverOffsetX), "rock").setImmovable(true).setScale(1);
-        this.receiver.body.setAllowGravity(false)
+        this.receiver = this.add.sprite(this.receiverOffsetX, height - (height - this.receiverOffsetX), "receiver", 0).setScale(0.5);
+        this.physics.add.existing(this.receiver);
+        this.receiver.body.setSize(this.receiver.width / 3, this.receiver.height / 3).setOffset(140, 50);
+        this.receiver.body.setAllowGravity(false).setImmovable(true);
+
+
+        this.bone = this.add.sprite(width + this.textures.get("bone").getSourceImage().width * 0.5, height + 200, "bone", 0).setScale(0.5);
+        this.physics.add.existing(this.bone);
+        this.bone.body.setBounce(1).setDrag(0.5).setDamping(true);
+        this.bone.body.setAllowGravity(false);
+
+        this.anims.create({
+            key: "fly",
+            frames: this.anims.generateFrameNumbers("bone", { start: 0, end: 3 }),
+            frameRate: 12,
+            repeat: -1,
+        });
+
+        
         // this.aim_line = this.add.line(0, 0, this.arrow.getBottomCenter().x, this.arrow.getBottomCenter().y, this.arrow.getTopCenter().x, this.arrow.getTopCenter().y, "OxFF0000", 1);
 
         this.physics.world.gravity.y = this.GRAVITY;
@@ -72,6 +93,8 @@ class BoneGame extends Phaser.Scene {
         this.input.keyboard.on("keydown-UP", () => {
             if (!this.throwing) {
                 this.throwing = true;
+                this.player.setFrame(1);
+                this.bone.play("fly", true);
                 this.bone.setPosition(this.arrow.x - 40, this.arrow.y - 40);
                 console.log("Angle: " + this.arrow.angle);
                 console.log(" COS: " + Math.cos(Phaser.Math.DegToRad(this.arrow.angle)));
@@ -110,6 +133,8 @@ class BoneGame extends Phaser.Scene {
         if (!this.hit) {
             this.arrow.angle += (this.ARROW_SPEED * this.ARROW_DIRECTION);
             if (this.bone.x < 0) {
+                this.bone.anims.stop("fly");
+                this.player.setFrame(0);
                 this.throwing = false;
                 this.bone.setPosition(width + this.textures.get("rock").getSourceImage().width, height + 200);
             }
@@ -117,6 +142,9 @@ class BoneGame extends Phaser.Scene {
             this.hit = false;
             this.win = true;
             this.scene.pause();
+            this.player.setFrame(2);
+            this.receiver.setFrame(1);
+            this.bone.destroy();
             this.transitionOut();
         }
         

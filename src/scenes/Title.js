@@ -8,6 +8,18 @@ class Title extends Phaser.Scene {
             frameWidth: 480,
             frameHeight: 480,
         });
+        this.load.spritesheet("bone", "./assets/spritesheets/bone.png",{
+            frameWidth: 128,
+            frameHeight: 128,
+        });
+        this.load.spritesheet("receiver", "./assets/spritesheets/receiver.png",{
+            frameWidth: 480,
+            frameHeight: 480,
+        });
+        this.load.spritesheet("thrower", "./assets/spritesheets/thrower.png",{
+            frameWidth: 480,
+            frameHeight: 480,
+        });
         this.load.image("rock", "./assets/rrrock.png");
         this.load.image("arrow", "./assets/arrow.png");
         this.load.audio("transition", "./assets/Boo-womp - Sound Effect.mp3");
@@ -29,6 +41,7 @@ class Title extends Phaser.Scene {
         this.load.image("crumbBackground1", "./assets/crumbBackground1.png");
         this.load.image("crumbBackground2", "./assets/crumbBackground2.png");
         this.load.image("crumb", "./assets/crumb.png");
+
     }
 
     create() {
