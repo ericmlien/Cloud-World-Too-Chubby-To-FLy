@@ -116,26 +116,28 @@ class Transition extends Phaser.Scene {
                 }
             });
 
-            this.popup = this.add.image(width / 2, height / 2, "rock").setOrigin(0.5, 0.5).setScale(0);
-            this.popupout = this.tweens.chain({
-                targets: this.popup,
-                loop: 0,
-                tweens: [
-                    {
-                        scale: 2,
-                        ease: "Expo.easeOut",
-                        duration: 200,
-                        repeat: 0,
-                    },
-                    {
-                        y: -this.popup.height,
-                        ease: "Back.easeIn",
-                        duration: 400,
-                        repeat:0,
-                    }
-                ],
-            })
-
+            this.popupkey = ""
+            if (this.gameScore > 0) {
+                this.popup = this.add.image(width / 2, height / 2, "complete").setOrigin(0.5, 0.5).setScale(0);
+                this.popupout = this.tweens.chain({
+                    targets: this.popup,
+                    loop: 0,
+                    tweens: [
+                        {
+                            scale: 1,
+                            ease: "Expo.easeOut",
+                            duration: 400,
+                            repeat: 0,
+                        },
+                        {
+                            y: -this.popup.height,
+                            ease: "Expo.easeIn",
+                            duration: 300,
+                            repeat:0,
+                        }
+                    ],
+                });
+            }
         } else {
             console.log('texture error');
         }

@@ -41,6 +41,7 @@ class Title extends Phaser.Scene {
         this.load.image("crumbBackground1", "./assets/crumbBackground1.png");
         this.load.image("crumbBackground2", "./assets/crumbBackground2.png");
         this.load.image("crumb", "./assets/crumb.png");
+        this.load.image("complete", "./assets/complete.png");
 
     }
 
