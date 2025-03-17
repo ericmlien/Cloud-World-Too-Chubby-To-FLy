@@ -18,13 +18,14 @@ class CrumbGame extends Phaser.Scene {
     create() {
         console.log("" + this.DIFFICULTY);
         this.cameras.main.postFX.addPixelate(0.4);
-        this.cameras.main.setBackgroundColor(0xFACADE);
+        this.background2 = this.add.image(width - this.textures.get("crumbBackground2").getSourceImage().width * 0.3, height / 2, "crumbBackground2").setScale(0.6);
+        this.background = this.add.image(width - this.textures.get("crumbBackground1").getSourceImage().width * 0.3, height / 2, "crumbBackground1").setScale(0.6);
         this.GAMES[0][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 
         this.transition = this.sound.add("transition");
 
-        this.player = this.physics.add.sprite(width / 2, height / 2, "character", 1).setScale(2);
+        this.player = this.physics.add.sprite(width / 2, height / 2, "character", 0).setScale(0.2);
         this.player.body.setCollideWorldBounds(true);
         this.player.body.setCircle(this.player.body.width / 3, this.player.body.width / 2 - this.player.body.width / 3, this.player.body.height / 4);
         
@@ -69,9 +70,11 @@ class CrumbGame extends Phaser.Scene {
         if (!this.timeUp && this.checkCrumbs()){
             let playerVector = new Phaser.Math.Vector2(0, 0);
             if (cursors.left.isDown){
+                this.player.setFrame(1);
                 playerVector.x = -1;
 
             } else if (cursors.right.isDown){
+                this.player.setFrame(0);
                 playerVector.x = 1;
             }
             if (cursors.up.isDown){
@@ -95,9 +98,10 @@ class CrumbGame extends Phaser.Scene {
 
     spawnCrumb() {
         let crumb_scale = Phaser.Math.Between(8, 12);
-        let crumb = new Crumb(this, this.CRUMB_SIZE * (crumb_scale / 10), crumb_scale / 10);
+        console.log("curent Scale: " + this.CRUMB_SIZE / this.textures.get("crumb").getSourceImage().width);
+        let crumb = new Crumb(this, (this.CRUMB_SIZE * (crumb_scale / 10) * (this.CRUMB_SIZE / this.textures.get("crumb").getSourceImage().width)), crumb_scale / 10 * (this.CRUMB_SIZE / this.textures.get("crumb").getSourceImage().width));
         console.log("Width: " + crumb.width);
-        console.log("Height: " + crumb.height);
+        console.log("Height: " + crumb.height); 
         this.crumbGroup.add(crumb);
     }    
     
@@ -113,6 +117,7 @@ class CrumbGame extends Phaser.Scene {
         if (this.transitioning) return;
         this.scene.pause();
         this.transitioning = true;
+        this.background.destroy();
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
         this.game.renderer.snapshot((snapshotImage) => {

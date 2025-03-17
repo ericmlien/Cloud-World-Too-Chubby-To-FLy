@@ -4,8 +4,9 @@ class Title extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet("character", "./assets/spritesheets/Character_002.png",{
-            frameWidth: 48,
+        this.load.spritesheet("character", "./assets/spritesheets/player.png",{
+            frameWidth: 480,
+            frameHeight: 480,
         });
         this.load.image("rock", "./assets/rrrock.png");
         this.load.image("arrow", "./assets/arrow.png");
@@ -22,6 +23,12 @@ class Title extends Phaser.Scene {
         this.load.image("toss", "./assets/Toss!.png");
         this.load.image("reach", "./assets/Reach!.png");
         this.load.image("clean", "./assets/Clean!.png");
+        this.load.image("shovel", "./assets/shovel.png");
+        this.load.image("tail", "./assets/tail.png");
+        this.load.image("hand", "./assets/hand.png");
+        this.load.image("crumbBackground1", "./assets/crumbBackground1.png");
+        this.load.image("crumbBackground2", "./assets/crumbBackground2.png");
+        this.load.image("crumb", "./assets/crumb.png");
     }
 
     create() {
@@ -30,9 +37,8 @@ class Title extends Phaser.Scene {
 
         this.registry.set("GAMES", [
             ["crumbScene", 0],
-            ["tailScene", 0],
-            ["boneScene", 0],
             ["shovelScene", 0],
+            ["boneScene", 0],
         ]);
         
         this.registry.set("DIFFICULTY", 1);

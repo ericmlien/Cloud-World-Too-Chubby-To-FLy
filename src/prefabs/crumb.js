@@ -1,12 +1,12 @@
 class Crumb extends Phaser.Physics.Arcade.Sprite {
     constructor (scene, size, scale) {
-        super (scene, Phaser.Math.Between(size, game.config.width - size), Phaser.Math.Between(size, game.config.height - size), "rock");
+        super (scene, Phaser.Math.Between(size, game.config.width - size), Phaser.Math.Between(size, game.config.height - size), "crumb");
         this.setScale(scale);
         this.width = size;
         this.height = size;
         this.parentScene = scene;
         this.parentScene.add.existing(this);
-        this.parentScene.physics.add.existing(this).setCircle(this.width / (2 * (scale * 1.1)), 0, this.height / (scale * 10)).setBounce(2);
+        this.parentScene.physics.add.existing(this).setBounce(2);
     }
 
     update() {

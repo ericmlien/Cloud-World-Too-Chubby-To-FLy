@@ -14,11 +14,11 @@ class TailGame extends Phaser.Scene {
     }
     
     create () {
-        this.cameras.main.setBackgroundColor(0xDDDDDD);
+        this.cameras.main.setBackgroundColor(0x8eedf5);
 
         this.physics.world.setBounds(0, 0, width, height);
 
-        this.GAMES[1][1] += 1;
+        this.GAMES[3][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 
         this.transition = this.sound.add("transition");
@@ -27,9 +27,12 @@ class TailGame extends Phaser.Scene {
         this.timeUp = false;
         this.win = true;
 
-        this.hand = this.physics.add.sprite(width - this.textures.get("rock").getSourceImage().width, height / 2, "rock").setCollideWorldBounds(true).setScale(1.5);
-        this.tail = this.physics.add.sprite(this.textures.get("rock").getSourceImage().width, height / 2, "rock").setImmovable(true).setCollideWorldBounds(true).setBounce(1).setScale(1.5);
-        this.tail.body.onWorldBounds = true;
+        this.hand = this.physics.add.sprite(width + this.textures.get("hand").getSourceImage().width * 0.3 - 150, height / 2, "hand").setOrigin(1, 0.5).setCollideWorldBounds(true).setScale(0.3);
+        this.physics.add.existing(this.hand);
+        this.hand.body.setSize(200, 450).setOffset(0, 200);
+        this.tail = this.add.sprite(340, height / 2, "tail").setOrigin(1, 0.5).setScale(0.2);
+        this.physics.add.existing(this.tail);
+        this.tail.body.setSize(100, this.tail.body.height + 30);
 
 
         this.stopInteraction = false;
@@ -55,7 +58,7 @@ class TailGame extends Phaser.Scene {
                     targets: this.hand,
                     x: {
                         from: width,
-                        to: this.hand.width + this.tail.width,
+                        to: 0,
                     },
                     duration: 600,
                     repeat: 0,
@@ -66,11 +69,11 @@ class TailGame extends Phaser.Scene {
         
         this.tailDirection = -1;
         function moveTail() {
-            this.tailMoveTo = this.tailDirection < 0 ? Phaser.Math.Between(this.tail.height, this.tail.body.y) : Phaser.Math.Between(this.tail.body.y, game.config.height - this.tail.height);
+            this.tailMoveTo = this.tailDirection < 0 ? Phaser.Math.Between(this.tail.body.height, this.tail.body.y) : Phaser.Math.Between(this.tail.body.y, height - this.tail.body.height);
             this.tweens.add({
                 targets: this.tail,
                 y: this.tailMoveTo,
-                ease: "Back.easeOut",
+                ease: "Expo.easeOut",
                 duration: Math.max(600, 1300 - 0.5 * Math.pow(this.LOWEST, 1.2)),
                 onComplete: () => {
                     this.tailDirection *= -1;

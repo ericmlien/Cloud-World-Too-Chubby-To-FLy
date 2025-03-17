@@ -12,10 +12,16 @@ class ShovelGame extends Phaser.Scene {
     }
 
     create() {
-        this.shovel = this.add.sprite(width / 2, height / 2, "arrow").setScale(5).setOrigin(0.5, 1);
-        this.shovel.angle = -120;
 
-        this.GAMES[3][1] += 1;
+        this.background = this.add.image(width, height / 5, "titleBackground").setScale(1);
+
+
+        this.shovel = this.add.sprite(width / 5, height - 100, "shovel").setScale(2).setOrigin(0.5, 0);
+        this.shovel.angle = -90;
+        this.cloud = this.add.image(-300, height * 2 - 300, "leftTitleCloud").setOrigin(0, 1).setScale(1.4);
+
+
+        this.GAMES[1][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -76,6 +82,8 @@ class ShovelGame extends Phaser.Scene {
     transitionOut() {
         if (this.transitioning) return;
         this.scene.pause();
+        this.shovel.setPosition(width / 3, height - 300);
+        this.shovel.setAngle(-80);
         this.transitioning = true;
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;

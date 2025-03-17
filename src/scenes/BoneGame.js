@@ -12,7 +12,7 @@ class BoneGame extends Phaser.Scene {
         this.BONE_SPEED =  2400 * (this.DIFFICULTY / 2);
         this.ARROW_SPEED = 1.4 * (this.DIFFICULTY / 2);
         this.ARROW_DIRECTION = 1;
-        this.TURN_DELAY = 1200 / this.ARROW_SPEED;
+        this.TURN_DELAY = 1000 / this.ARROW_SPEED;
     }
     create() {
 
