@@ -12,6 +12,9 @@ class ShovelGame extends Phaser.Scene {
     }
 
     create() {
+        // This game requires the player to mash their up and down arrow keys, alternating between the two.
+        // The number of shakes to win the game scales with the number of games played and the difficulty.
+        // That's it.
 
         this.background = this.add.image(width, height / 5, "titleBackground").setScale(1);
 

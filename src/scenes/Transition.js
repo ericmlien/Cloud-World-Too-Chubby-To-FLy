@@ -13,6 +13,17 @@ class Transition extends Phaser.Scene {
         this.LOWEST_TRANSITION = Math.floor(this.TRANSITIONS_PLAYED / this.TRANSITIONS.length);
     }
     create() {
+        // As mentioned in the title scene, this scene picks a random transition/game to queue up. 
+        // Once a choice has ben made, that choice can't be made again until the rest of the choices are picked.
+        // We use NUM_PLAYEd and TRANSITIONS_PLAYED to keep track of the total number of games and transitions respectively.
+        // We get the lowest number of plays by dividing the total by the length of the respective arrays.
+        // We only pick from the games/transitions that have a play count that match this lowest number.
+        // Since previously chosen games/transitions will have a number higher (exactly one higher), this prevents us from picking the same option twice in a row too often.
+
+        // As for the transitions themselves, each scene has transitionOut and transitionIn.
+        // TransitionOut updates any necessary global variables such as score while taking a snapshot using the Game Renderer.
+        // TransitionIn takes the existing snapshot from the previous scene and applies a shrinking mask on it to create a seamless transition.
+
         this.cameras.main.setBackgroundColor(0xDAAAAB);  
         console.log("The number of games played is: " + this.NUM_PLAYED);
         console.log("The lowest game played is: " + this.LOWEST);

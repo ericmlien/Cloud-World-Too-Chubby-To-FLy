@@ -16,6 +16,10 @@ class BoneGame extends Phaser.Scene {
     }
     create() {
 
+        // Here, we just have an arrow and a singular piece of meat that is snapped to the arrow and thrown at a target upon the up-arrow being pressed.
+        // Super simple- there's gravity in this scene, simulating the arc of a throw.
+        // The meat's initial direction is calculated using the current angle of the aiming arrow.
+
         this.GAMES[2][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 

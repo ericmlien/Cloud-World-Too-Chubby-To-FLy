@@ -16,6 +16,10 @@ class CrumbGame extends Phaser.Scene {
 
 
     create() {
+        // I used the framework of movement from Nathan's "Beyond Orthagonal" demo for the movement of this one.
+        // It's just simple arrow key movement, complete with normalized vectors!
+        // If the progress bar is fully depleted or there's no more crumbs within the world bounds, the game ends.
+
         console.log("" + this.DIFFICULTY);
 
         this.background2 = this.add.image(width - this.textures.get("crumbBackground2").getSourceImage().width * 0.3, height / 2, "crumbBackground2").setScale(0.6);

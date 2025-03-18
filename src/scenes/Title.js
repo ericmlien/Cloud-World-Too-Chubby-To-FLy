@@ -73,22 +73,31 @@ class Title extends Phaser.Scene {
             });
             this.music.play();
         }
-
+        
+        // The global set of games, with each field having the game's scene key and the number of times it's been played.
         this.registry.set("GAMES", [
             ["crumbScene", 0],
             ["shovelScene", 0],
             ["boneScene", 0],
         ]);
-
+        // the global set of transitions, I only made one lol but it's the same idea as the games array.
+        // The Transition scene will look at these and determine which game or transition to play next.
+        // The game runs in cycles, where a game/transition is picked at random, after which it can't be picked until every other choice that hasn't been picked yet gets picked.
         this.registry.set("TRANSITIONS", [
             ["chomp", 0],
         ])
 
-        this.registry.set("TRANSITIONS_PLAYED", 0);
-        
-        this.registry.set("DIFFICULTY", 1);
-        this.registry.set("LIVES", 3);
+        // Global variables to keep track of the number of total played transitions and games. It's for the same thing as the arrays above.
         this.registry.set("NUM_PLAYED", 0);
+        this.registry.set("TRANSITIONS_PLAYED", 0);
+
+        // We use the number of games played to scale the difficulty up, shortening game time and increasing completion requirements, as well as score gain.
+        this.registry.set("DIFFICULTY", 1);
+
+        // We keep track of the number of failed games for the gameOver sceen.
+        this.registry.set("LIVES", 3);
+        
+        // Global score variables!
         this.registry.set("GAME_SCORE", 0);
         this.registry.set("RUNNING_SCORE", 0);
 

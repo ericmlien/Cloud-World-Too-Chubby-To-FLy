@@ -14,6 +14,12 @@ class TailGame extends Phaser.Scene {
     }
     
     create () {
+
+        // Here's a huge learning experience for me: DON'T WAIT TO MAKE ALL THE ASSETS AT THE END!
+        // Because of the differing sizes and shapes of the new assets I created compared to the temp assets I built the game with, I got a TON of physics bugs.
+        // Due to time I had to scrap this one- it would take so much time adjusting physics bodies to fit the new sprites- besides, this one was always my least favorite game.
+        // THIS IS NOT PART OF THE FINAL PROJECT- please do not grade it as "redundant code", thanks for understanding.
+
         this.cameras.main.setBackgroundColor(0x8eedf5);
 
         this.physics.world.setBounds(0, 0, width, height);
