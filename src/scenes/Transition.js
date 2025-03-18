@@ -33,14 +33,17 @@ class Transition extends Phaser.Scene {
 
         this.transition = this.sound.add("transition", {volume: 0.5});
 
-        if (!this.game.sound.get("window")) {
-            this.music = this.game.sound.add('window', {
-            loop: true,
-            volume: 0.5,
+        this.music = this.game.sound.get("window");
+        
+        if (!this.music) {
+            this.music = this.game.sound.add("window", {
+                loop: true,
+                volume: 0.5,
             });
             this.music.play();
+        } else if (!this.music.isPlaying) {
+            this.music.play();
         }
-
 
         this.ROLL = 0;
         let next_game_found = false;

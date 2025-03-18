@@ -37,7 +37,7 @@ class CrumbGame extends Phaser.Scene {
         this.crumbGroup = this.add.group({
             runChildUpdate: true,
         });
-        for (let i = 0; i < 3 + Math.floor(this.NUM_PLAYED * 0.2); i++) {
+        for (let i = 0; i < 4 + Math.floor(this.NUM_PLAYED * 0.2); i++) {
             this.spawnCrumb();
         }
 

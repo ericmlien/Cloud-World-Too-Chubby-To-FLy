@@ -66,13 +66,18 @@ class Title extends Phaser.Scene {
     create() {
         this.cameras.main.setBackgroundColor(0xBEEEED);
 
-        if (!this.game.sound.get("world")) {
-            this.music = this.game.sound.add('world', {
-            loop: true,
-            volume: 0.5,
+        this.music = this.game.sound.get("world");
+        
+        if (!this.music) {
+            this.music = this.game.sound.add("world", {
+                loop: true,
+                volume: 0.5,
             });
             this.music.play();
+        } else if (!this.music.isPlaying) {
+            this.music.play();
         }
+
         
         // The global set of games, with each field having the game's scene key and the number of times it's been played.
         this.registry.set("GAMES", [
