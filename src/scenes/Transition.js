@@ -7,12 +7,18 @@ class Transition extends Phaser.Scene {
         this.LIVES = this.registry.get("LIVES");
         this.NUM_PLAYED = this.registry.get("NUM_PLAYED");
         this.GAMES = this.registry.get("GAMES");
+        this.TRANSITIONS = this.registry.get("TRANSITIONS");
+        this.TRANSITIONS_PLAYED = this.registry.get("TRANSITIONS_PLAYED");
         this.LOWEST = Math.floor(this.NUM_PLAYED / this.GAMES.length);
+        this.LOWEST_TRANSITION = Math.floor(this.TRANSITIONS_PLAYED / this.TRANSITIONS.length);
     }
     create() {
         this.cameras.main.setBackgroundColor(0xDAAAAB);  
         console.log("The number of games played is: " + this.NUM_PLAYED);
         console.log("The lowest game played is: " + this.LOWEST);
+
+        console.log("The number of transitions played is: " + this.TRANSITIONS_PLAYED);
+        console.log("The lowest transition played is: " + this.LOWEST_TRANSITION);
 
         this.transition = this.sound.add("transition");
 
@@ -33,25 +39,70 @@ class Transition extends Phaser.Scene {
             }
         }
 
+        let next_transition_found = false;
+        this.next_transition = "";
 
-        this.transitionTimer = this.time.addEvent(this.transitionTimerConfig);
+        for (let i = 0; i < this.TRANSITIONS.length; i++){
+            console.log("The " + i + "th element in TRANSITIONS is: " + this.TRANSITIONS[i][0]);
+            console.log("its playcount is: " + this.TRANSITIONS[i][1]);
+        }
+        while(!next_transition_found) {
+            this.ROLL = Phaser.Math.Between(0, this.TRANSITIONS.length - 1);
+            if (this.TRANSITIONS[this.ROLL][1] == this.LOWEST_TRANSITION) {
+                this.TRANSITIONS[this.ROLL][1]++;
+                this.registry.set("TRANSITIONS", this.TRANSITIONS);
+                this.next_transition = this.TRANSITIONS[this.ROLL][0];
+                this.TRANSITIONS_PLAYED++;
+                this.registry.set("TRANSITIONS_PLAYED", this.TRANSITIONS_PLAYED);
+                next_transition_found = true;
+            }
+        }
+        if (this.next_transition == "chomp") {
+            this.background = this.add.image(width / 2, height / 2, "chompBackground").setScale(1.11);
+            this.chomper = this.add.sprite(width / 2, height / 2 + 20, "chomp", 0).setScale(1.11);
+            this.anims.create({
+                key: "chomp",
+                frames: this.anims.generateFrameNumbers("chomp", {start: 0, end: 4}),
+                frameRate: 10,
+                repeat:-1,
+            });
+            this.chomper.play("chomp");
+        }
 
+        this.lifeGroup = this.add.group();
+        this.turnRight = false;
 
         for (let i = 1; i <= this.LIVES; i++) {
-            let life_icon = new LifeIcon(this, 60, 40 + i * (height / 7), 1.5);
+            let outline = new LifeIcon(this, 60, i * (height / 7), 0.22).setTint(0xc0fbf2);
+            let life_icon = new LifeIcon(this, 60, i * (height / 7), 0.2);
+            life_icon.setAngle(-10);
+            outline.setAngle(-10);
+            this.lifeGroup.add(life_icon);
+            this.lifeGroup.add(outline);
         }
+
+        this.time.addEvent({
+            delay: 600,
+            callback: () => {
+                this.turnRight = !this.turnRight;
+                this.lifeGroup.getChildren().forEach(life_icon => {
+                    life_icon.setAngle(this.turnRight ? 10 : -10);
+                });
+            },
+            loop: true
+        });
 
         let scoreConfig = {
             fontFamily: "puppycat",
-            fontSize:"48px",
-            color: "#BEEAAD",
+            fontSize:"96px",
+            color: "#c0fbf2",
             align: "center",
         }
 
         this.runningScore = this.registry.get("RUNNING_SCORE");
         this.gameScore = this.registry.get("GAME_SCORE");
 
-        this.scoreCounter = this.add.text(width / 2, height / 2, this.runningScore, scoreConfig).setOrigin(0.5);
+        this.scoreCounter = this.add.text(width / 2, height / 3, this.runningScore, scoreConfig).setOrigin(0.5);
 
         this.scoreCountUp = this.tweens.add({
             targets: {
@@ -116,7 +167,6 @@ class Transition extends Phaser.Scene {
                 }
             });
 
-            this.popupkey = ""
             if (this.gameScore > 0) {
                 this.popup = this.add.image(width / 2, height / 2, "complete").setOrigin(0.5, 0.5).setScale(0);
                 this.popupout = this.tweens.chain({

@@ -82,8 +82,6 @@ class ShovelGame extends Phaser.Scene {
     transitionOut() {
         if (this.transitioning) return;
         this.scene.pause();
-        this.shovel.setPosition(width / 3, height - 300);
-        this.shovel.setAngle(-80);
         this.transitioning = true;
         this.registry.set("NUM_PLAYED", this.NUM_PLAYED);
         let textureManager = this.textures;
@@ -95,6 +93,8 @@ class ShovelGame extends Phaser.Scene {
             
             requestAnimationFrame(() => {
                 if (this.win) {
+                    this.shovel.setPosition(width / 3, height - 300);
+                    this.shovel.setAngle(-80);
                     this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));
                 } else {
                     this.registry.set("GAME_SCORE", 0);

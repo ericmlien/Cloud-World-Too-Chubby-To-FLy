@@ -17,7 +17,6 @@ class CrumbGame extends Phaser.Scene {
 
     create() {
         console.log("" + this.DIFFICULTY);
-        this.cameras.main.postFX.addPixelate(0.4);
         this.background2 = this.add.image(width - this.textures.get("crumbBackground2").getSourceImage().width * 0.3, height / 2, "crumbBackground2").setScale(0.6);
         this.background = this.add.image(width - this.textures.get("crumbBackground1").getSourceImage().width * 0.3, height / 2, "crumbBackground1").setScale(0.6);
         this.GAMES[0][1] += 1;

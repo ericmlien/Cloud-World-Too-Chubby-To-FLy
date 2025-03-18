@@ -4,8 +4,10 @@ class GameOver extends Phaser.Scene {
     }
 
     create() {
-        this.score = 3500;
+        this.score = this.registry.get("RUNNING_SCORE");
         this.count = 0;
+
+        this.background = this.add.image(width / 2, height / 2, "gameOver").setScale(1.11);
 
 
         let scoreConfig = {
@@ -14,14 +16,14 @@ class GameOver extends Phaser.Scene {
             color: "#BEEAAD",
             align: "center",
         }
-        this.scoreCounter = this.add.text(width / 2, height / 2, this.count, scoreConfig).setOrigin(0.5);
+        this.scoreCounter = this.add.text(width / 2, height - height / 10, this.count, scoreConfig).setOrigin(0.5);
 
         this.scoreCountUp = this.tweens.add({
             targets: {
                 value: this.count,
             },
             value: this.score,
-            duration: this.score * 1.5,
+            duration: this.score,
             ease: "Quart.easeOut",
             repeat: false,
             onUpdate: (tween) => {

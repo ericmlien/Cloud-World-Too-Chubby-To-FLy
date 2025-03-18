@@ -20,6 +20,10 @@ class Title extends Phaser.Scene {
             frameWidth: 480,
             frameHeight: 480,
         });
+        this.load.spritesheet("chomp", "./assets/spritesheets/chomp.png",{
+            frameWidth: 720,
+            frameHeight: 720,
+        });
         this.load.image("rock", "./assets/rrrock.png");
         this.load.image("arrow", "./assets/arrow.png");
         this.load.audio("transition", "./assets/Boo-womp - Sound Effect.mp3");
@@ -42,18 +46,28 @@ class Title extends Phaser.Scene {
         this.load.image("crumbBackground2", "./assets/crumbBackground2.png");
         this.load.image("crumb", "./assets/crumb.png");
         this.load.image("complete", "./assets/complete.png");
-
+        this.load.image("fart", "./assets/fart.png");
+        this.load.image("fartBackground", "./assets/fartBackground.png");
+        this.load.image("chompBackground", "./assets/chompBackground.png");
+        this.load.image("life", "./assets/life.png");
+        this.load.image("gameOver", "./assets/gameOver.png");
     }
 
     create() {
         this.cameras.main.setBackgroundColor(0xBEEEED);
-        this.cameras.main.postFX.addPixelate(1);
+
 
         this.registry.set("GAMES", [
             ["crumbScene", 0],
             ["shovelScene", 0],
             ["boneScene", 0],
         ]);
+
+        this.registry.set("TRANSITIONS", [
+            ["chomp", 0],
+        ])
+
+        this.registry.set("TRANSITIONS_PLAYED", 0);
         
         this.registry.set("DIFFICULTY", 1);
         this.registry.set("LIVES", 3);
@@ -144,23 +158,32 @@ class Title extends Phaser.Scene {
             repeat: 0,
             yoyo: false,
             onComplete: () => {
-                this.time.addEvent({
-                    delay: 1000,
-                    callback: this.moveRightCloud,
-                    callbackScope: this,
-                    loop: true
+                this.tweens.add({
+                    targets: this.rightCloud,
+                    y: this.rightCloud.y + 15,
+                    duration: 1800,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
                 });
-                this.time.addEvent({
-                    delay: 1000,
-                    callback: this.moveLeftCloud,
-                    callbackScope: this,
-                    loop: true
+                
+                this.tweens.add({
+                    targets: this.centerTitleCloud,
+                    y: this.centerTitleCloud.y + 10,
+                    duration: 1400,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
                 });
-                this.time.addEvent({
-                    delay: 1000,
-                    callback: this.moveCenterCloud,
-                    callbackScope: this,
-                    loop: true
+                
+
+                this.tweens.add({
+                    targets: this.leftCloud,
+                    y: this.leftCloud.y + 25,
+                    duration: 2200,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
                 });
                 this.startIn.play();
                 
