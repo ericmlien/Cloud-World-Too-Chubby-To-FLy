@@ -16,10 +16,10 @@ let config = {
     physics: {
         default: "arcade",
         arcade: {
-            debug: true,
+            debug: false,
         },
     },
-    scene: [ Title, GameOver, Menu, CrumbGame, TailGame, BoneGame, ShovelGame, Transition ]
+    scene: [ Title, GameOver, Menu, CrumbGame, TailGame, BoneGame, ShovelGame, Transition, Credits ]
 }
 
 let game = new Phaser.Game(config)

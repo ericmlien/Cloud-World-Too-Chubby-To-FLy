@@ -17,12 +17,14 @@ class CrumbGame extends Phaser.Scene {
 
     create() {
         console.log("" + this.DIFFICULTY);
+
         this.background2 = this.add.image(width - this.textures.get("crumbBackground2").getSourceImage().width * 0.3, height / 2, "crumbBackground2").setScale(0.6);
         this.background = this.add.image(width - this.textures.get("crumbBackground1").getSourceImage().width * 0.3, height / 2, "crumbBackground1").setScale(0.6);
         this.GAMES[0][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 
-        this.transition = this.sound.add("transition");
+        this.transition = this.sound.add("transition", {volume: 0.5});
+        this.kick = this.sound.add("kick", {volume: 2});
 
         this.player = this.physics.add.sprite(width / 2, height / 2, "character", 0).setScale(0.2);
         this.player.body.setCollideWorldBounds(true);
@@ -37,6 +39,7 @@ class CrumbGame extends Phaser.Scene {
 
         cursors = this.input.keyboard.createCursorKeys();
         this.physics.add.collider(this.player, this.crumbGroup, () => {
+            this.kick.play();
             console.log(" HII !!!");
         });
         
@@ -132,6 +135,10 @@ class CrumbGame extends Phaser.Scene {
                     this.registry.set("GAME_SCORE", 0);
                 }
                 if (this.LIVES == 0) {
+                    const music = this.game.sound.get('window');
+                    if (music && music.isPlaying) {
+                        music.stop();
+                    }
                     this.scene.start("gameoverScene");
                 } else {
                     this.scene.start("transitionScene");

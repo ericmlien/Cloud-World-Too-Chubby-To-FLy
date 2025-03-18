@@ -15,6 +15,7 @@ class ShovelGame extends Phaser.Scene {
 
         this.background = this.add.image(width, height / 5, "titleBackground").setScale(1);
 
+        this.shovelOut = this.sound.add("shovelOut", {loop: false, volume: 2.4});
 
         this.shovel = this.add.sprite(width / 5, height - 100, "shovel").setScale(2).setOrigin(0.5, 0);
         this.shovel.angle = -90;
@@ -26,7 +27,7 @@ class ShovelGame extends Phaser.Scene {
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
-        this.transition = this.sound.add("transition");
+        this.transition = this.sound.add("transition", {volume: 0.5});
         this.win = false;
 
         this.lastKey = null;
@@ -59,6 +60,9 @@ class ShovelGame extends Phaser.Scene {
     update() {
         if (this.shakes > this.maxShakes) {
             this.win = true;
+            this.shovel.setPosition(width / 3, height - 300);
+            this.shovel.setAngle(-80);
+            this.shovelOut.play();
             this.transitionOut();
         } else if (this.shakes <= this.maxShakes && !this.gameOver){
             let pressedKey = null;
@@ -93,13 +97,15 @@ class ShovelGame extends Phaser.Scene {
             
             requestAnimationFrame(() => {
                 if (this.win) {
-                    this.shovel.setPosition(width / 3, height - 300);
-                    this.shovel.setAngle(-80);
                     this.registry.set("GAME_SCORE", 100 * (1 + 0.5 * (Math.pow(this.LOWEST, 1.4))));
                 } else {
                     this.registry.set("GAME_SCORE", 0);
                 }
                 if (this.LIVES == 0) {
+                    const music = this.game.sound.get('window');
+                    if (music && music.isPlaying) {
+                        music.stop();
+                    }
                     this.scene.start("gameoverScene");
                 } else {
                     this.scene.start("transitionScene");

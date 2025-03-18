@@ -20,7 +20,16 @@ class Transition extends Phaser.Scene {
         console.log("The number of transitions played is: " + this.TRANSITIONS_PLAYED);
         console.log("The lowest transition played is: " + this.LOWEST_TRANSITION);
 
-        this.transition = this.sound.add("transition");
+        this.transition = this.sound.add("transition", {volume: 0.5});
+
+        if (!this.game.sound.get("window")) {
+            this.music = this.game.sound.add('window', {
+            loop: true,
+            volume: 0.5,
+            });
+            this.music.play();
+        }
+
 
         this.ROLL = 0;
         let next_game_found = false;

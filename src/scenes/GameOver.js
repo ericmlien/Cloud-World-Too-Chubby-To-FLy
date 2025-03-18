@@ -8,6 +8,8 @@ class GameOver extends Phaser.Scene {
         this.count = 0;
 
         this.background = this.add.image(width / 2, height / 2, "gameOver").setScale(1.11);
+        this.dog = this.sound.add("dog");
+        this.dog.play();
 
 
         let scoreConfig = {
@@ -23,16 +25,22 @@ class GameOver extends Phaser.Scene {
                 value: this.count,
             },
             value: this.score,
-            duration: this.score,
+            duration: this.score > 3000 ? this.score : 3000,
             ease: "Quart.easeOut",
             repeat: false,
             onUpdate: (tween) => {
                 this.scoreCounter.setText(Math.floor(tween.getValue()));
             },
         });
+
+        cursors = this.input.keyboard.createCursorKeys();
+        
     }
 
     update() {
-
+        if (cursors.left.isDown || cursors.right.isDown || cursors.up.isDown || cursors.down.isDown){
+            this.dog.stop();
+            this.scene.start("titleScene");
+        }
     }
 }

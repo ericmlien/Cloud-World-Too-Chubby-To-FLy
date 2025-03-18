@@ -24,9 +24,7 @@ class Title extends Phaser.Scene {
             frameWidth: 720,
             frameHeight: 720,
         });
-        this.load.image("rock", "./assets/rrrock.png");
         this.load.image("arrow", "./assets/arrow.png");
-        this.load.audio("transition", "./assets/Boo-womp - Sound Effect.mp3");
         this.load.font("puppycat", "./assets/puppycat.ttf");
         this.load.image("title", "./assets/Cloudworld Title.png");
         this.load.image("titleBackground", "./assets/Title Background.png");
@@ -51,11 +49,30 @@ class Title extends Phaser.Scene {
         this.load.image("chompBackground", "./assets/chompBackground.png");
         this.load.image("life", "./assets/life.png");
         this.load.image("gameOver", "./assets/gameOver.png");
+        this.load.image("creditInstruct", "./assets/creditInstruct.png");
+        this.load.image("credits", "./assets/credits.png");
+
+
+        this.load.audio("world", "./assets/audio/Cloud World.mp3");
+        this.load.audio("dog", "./assets/audio/A Dog Is Choking On Your Hair.mp3");
+        this.load.audio("transition", "./assets/audio/transition.mp3");
+        this.load.audio("shovelOut", "./assets/audio/shovelOut.mp3");
+        this.load.audio("throw", "./assets/audio/throw.mp3");
+        this.load.audio("catch", "./assets/audio/catch.mp3");
+        this.load.audio("kick", "./assets/audio/kick.mp3");
+        this.load.audio("window", "./assets/audio/Stuck in the Window.mp3");
     }
 
     create() {
         this.cameras.main.setBackgroundColor(0xBEEEED);
 
+        if (!this.game.sound.get("world")) {
+            this.music = this.game.sound.add('world', {
+            loop: true,
+            volume: 0.5,
+            });
+            this.music.play();
+        }
 
         this.registry.set("GAMES", [
             ["crumbScene", 0],
@@ -190,15 +207,18 @@ class Title extends Phaser.Scene {
             },
         });
 
+        this.creditInstruct = this.add.image(width / 2, 20 + height / 2, "creditInstruct").setAlpha(0);
+
         this.startIn = this.add.tween({
             paused: true,
-            targets: this.start,
+            targets: [this.start, this.creditInstruct],
             alpha: 1,  
             duration: 1000,
             ease: "Quint.easeOut",
         });
 
         this.start.on("pointerdown", () => {
+            this.music.stop();
             this.scene.start("transitionScene");
         });
 
@@ -210,10 +230,15 @@ class Title extends Phaser.Scene {
             this.start.setScale(0.4);
         });
 
+
+        cursors = this.input.keyboard.createCursorKeys();
+        
     }
 
     update() {
-
+        if (cursors.left.isDown || cursors.right.isDown || cursors.up.isDown || cursors.down.isDown){
+            this.scene.start("creditsScene");
+        }
     }
 
     moveRightCloud() {

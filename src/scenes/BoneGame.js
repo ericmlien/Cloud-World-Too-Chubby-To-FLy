@@ -19,7 +19,9 @@ class BoneGame extends Phaser.Scene {
         this.GAMES[2][1] += 1;
         this.registry.set("GAMES", this.GAMES);
 
-         this.background = this.add.image(0, height - height / 3, "titleBackground").setScale(1);
+        this.background = this.add.image(0, height - height / 3, "titleBackground").setScale(1);
+
+
 
 
         this.player = this.add.sprite(Phaser.Math.Between(width - (width / 4), width), Phaser.Math.Between(height - (height / 4), height), "thrower", 0).setScale(0.5);
@@ -28,6 +30,8 @@ class BoneGame extends Phaser.Scene {
         console.log("Arrow x: " + this.arrow.x);
         this.arrow.angle = -90;
 
+
+        
 
 
         this.receiverOffsetX = Phaser.Math.Between(200, this.arrow.x - width / 2);
@@ -54,7 +58,9 @@ class BoneGame extends Phaser.Scene {
 
         this.physics.world.gravity.y = this.GRAVITY;
 
-        this.transition = this.sound.add("transition");
+        this.transition = this.sound.add("transition", {volume: 0.5});
+        this.throwSound = this.sound.add("throw", {volume: 0.3});
+        this.catchSound = this.sound.add("catch", {volume: 0.1});
 
         // this.aim_radius = (this.BONE_SPEED ** 2) / (this.gravity * Math.cos(Phaser.Geom.Line.Angle(this.aim_line)));
 
@@ -94,6 +100,7 @@ class BoneGame extends Phaser.Scene {
         this.input.keyboard.on("keydown-UP", () => {
             if (!this.throwing) {
                 this.throwing = true;
+                this.throwSound.play();
                 this.player.setFrame(1);
                 this.bone.play("fly", true);
                 this.bone.setPosition(this.arrow.x - 40, this.arrow.y - 40);
@@ -113,6 +120,7 @@ class BoneGame extends Phaser.Scene {
         
         this.physics.add.overlap(this.receiver, this.bone, () => {
             this.hit = true;
+            this.catchSound.play();
         });
 
         this.transitioning = false;
@@ -173,6 +181,10 @@ class BoneGame extends Phaser.Scene {
                     this.registry.set("GAME_SCORE", 0);
                 }
                 if (this.LIVES == 0) {
+                    const music = this.game.sound.get('window');
+                    if (music && music.isPlaying) {
+                        music.stop();
+                    }
                     this.scene.start("gameoverScene");
                 } else {
                     this.scene.start("transitionScene");
